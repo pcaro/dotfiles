@@ -32,3 +32,13 @@ build
 *.kpf
 
 eggs/*
+
+*~
+*egg-info
+build/*
+buildout/downloads/*
+buildout/parts/*
+buildout/eggs/*
+buildout/var/*
+buildout/etc/*
+buildout/bin/*
