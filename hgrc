@@ -1,6 +1,7 @@
 # http://mercurial.selenic.com/wiki/TipsAndTricks
 [ui]
-username = Pablo Caro <correo@pablocaro.es>
+username = pcaro
+# username = Pablo Caro <correo@pablocaro.es>
 ignore = ~/.hgignore
 # Enabling compression can speed up things drastically
 ssh = ssh -C
@@ -118,12 +119,11 @@ hgext.churn=
 # Adds the command "hg view"
 hgk=/usr/lib/pymodules/python2.6/hgext/hgk.py
 
-
 # Mercurial git
 # http://hg-git.github.com/
 # sudo aptitude install mercurial-git
 # bookmarks extension is recomended
-hgext.git =
+# hgext.git =
 
 # hg-prompt
 # http://stevelosh.com/projects/hg-prompt/
@@ -134,8 +134,9 @@ prompt = /home/pcaro/programas/hg-prompt/prompt.py
 # https://bitbucket.org/yinwm/hgflow/wiki/UserManual
 hgflow = /home/pcaro/programas/hgflow/src/hgflow/hgflow.py
 
-[extensions]
+
 # hgext.mercurial_keyring = /home/pcaro/programas/mercurial_keyring/mercurial_keyring.py
+
 
 ##### Opciones de la extensiones #####
 
@@ -166,9 +167,13 @@ attend = log, status, diff, annotate, glog, qdiff, cat, help, incoming, outcomin
 
 [hooks]
 # They fail with git clone if the source does not pass the hook!
-# pretxncommit.pyflakes = python:hghooks.code.pyflakeshook
-# pretxncommit.pep8 = python:hghooks.code.pep8hook
-# pretxncommit.pdb = python:hghooks.code.pdbhook
+pretxncommit.pyflakes = python:hghooks.code.pyflakeshook
+pretxncommit.pep8 = python:hghooks.code.pep8hook
+pretxncommit.pdb = python:hghooks.code.pdbhook
+
+pretxncommit.trac = python:yacoticket.ticket_checker
+
+
 
 [pep8]
 ignore = E501
