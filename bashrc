@@ -61,7 +61,7 @@ if [ "$PS1" ]; then
     # pip bash completion end
 
     # Virtualenvwrapper modified v function
-    source $HOME/.virtualenvwrapper_bashrc-1.4
+    source $HOME/.v_function
 
     # up function
     source $HOME/.up_function.sh
