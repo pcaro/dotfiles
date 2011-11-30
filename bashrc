@@ -84,7 +84,14 @@ if [ "$PS1" ]; then
 
     # rvm es como un virtualenv para ruby
     # http://rvm.beginrescueend.com/
-    [[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm"
+    # [[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm"
+
+    # rbenv es menos instrusivo que rvm
+    if [ -d $HOME/.rbenv ] ; then
+	export PATH="$HOME/.rbenv/bin:$PATH"
+	eval "$(rbenv init -)"
+    fi
+
 
     # mercurial prompt by hg-prompt
     if [ -f $HOME/.prompt.sh ] ; then
@@ -98,3 +105,10 @@ unset JAVA_HOME
 export JAVA_HOME=/usr/lib/jvm/java-6-sun
 unset JDK_HOME
 export JDK_HOME=/usr/lib/jvm/java-6-sun
+unset M2_HOME
+export M2_HOME=/home/pcaro/programas/apache-maven-3.0.3
+
+# set PATH so it includes user's private bin if it exists
+if [ -d $M2_HOME/bin ] ; then
+    PATH=$M2_HOME/bin:"${PATH}"
+fi

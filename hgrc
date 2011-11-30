@@ -137,6 +137,9 @@ hgflow = /home/pcaro/programas/hgflow/src/hgflow/hgflow.py
 
 # hgext.mercurial_keyring = /home/pcaro/programas/mercurial_keyring/mercurial_keyring.py
 
+# Reposettings
+# http://mercurial.selenic.com/wiki/ReposettingsExtension
+reposettings =  /home/pcaro/programas/hg-reposettings/reposettings.py
 
 ##### Opciones de la extensiones #####
 
@@ -173,7 +176,15 @@ pretxncommit.pdb = python:hghooks.code.pdbhook
 
 pretxncommit.trac = python:yacoticket.ticket_checker
 
-
-
 [pep8]
 ignore = E501
+
+[reposettings]
+base = /home/pcaro
+
+[hooks src/jspack]
+pretxncommit.trac =
+
+[hooks .dotfiles]
+pretxncommit.trac =
+
