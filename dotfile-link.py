@@ -1,18 +1,19 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 from glob import glob
 from os import chdir, environ, makedirs, symlink, walk
-from os.path import dirname, exists, expanduser, islink, join, realpath
+from os.path import dirname, exists, expanduser, islink, join, realpath, relpath
 from sys import stderr
 
 
 REPO = environ.get('DOTFILES_REPO', expanduser('~/.dotfiles'))
 HOME = environ['HOME']
-IGNORED = []
+EXCLUDED_DIRS = ['.hg', '.git', '.svn']
+IGNORED = ['dotfile-link', 'README']
 chdir(REPO)
 
 
 def expand_ignored():
-    ignore_globs = ['dotfile-link', 'README', '.*']
+    ignore_globs = []
     try:
         fh = open(join(REPO, '.dfignore'))
         for expr in fh.readlines():
@@ -27,18 +28,18 @@ def expand_ignored():
 
 
 def managed():
-    for dirpath, _, filenames in walk(REPO):
-        local_dir = dirpath[len(REPO):].lstrip('/')
+    for dirpath, dirs, filenames in walk(REPO):
+        for dir in EXCLUDED_DIRS:
+            if dir in dirs:
+                print >> stderr, "* skipping: %s/%s " % (dirpath, dir)
+                dirs.remove(dir)
+        relative_path = relpath(dirpath, REPO)
         for fn in filenames:
-            full_path = join(local_dir, fn)
+            full_path = join(relative_path, fn).lstrip('./')
             if any(full_path.startswith(i) for i in IGNORED):
                 continue
 
-            if not local_dir:
-                target = ("~/.%s" % full_path)
-            else:
-                target = ("~/%s" % full_path)
-
+            target = ("~/.%s" % full_path)
             yield join(REPO, full_path), expanduser(target)
 
 
