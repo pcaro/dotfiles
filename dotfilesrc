@@ -7,4 +7,6 @@ ignore = [
     '*.swp',
     'README']
 externals = {
-    '.bzr.log': '/dev/null'}
+    '.bzr.log':     '/dev/null',
+    '.adobe':       '/tmp',
+    '.macromedia':  '/tmp'}
