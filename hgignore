@@ -30,6 +30,8 @@ build
 .DS_Store
 *.pyc
 *.csproj.user
+*.sublime-project
+*.sublime-workspacehg
 *.suo
 *.egg-info
 *.kpf

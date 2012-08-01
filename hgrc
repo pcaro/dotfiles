@@ -182,7 +182,7 @@ hgk=/usr/share/pyshared/hgext/hgk.py
 # http://hg-git.github.com/
 # sudo aptitude install mercurial-git
 # bookmarks extension is recomended
-# hgext.git =
+hggit = /home/pcaro/programas/hg-git/hggit
 
 # hg-prompt
 # http://stevelosh.com/projects/hg-prompt/
