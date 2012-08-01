@@ -16,15 +16,43 @@ bitbucket.prefix = bitbucket.org
 bitbucket.username = pcaro
 
 [alias]
+help = help -v
 blame = annotate -u -n
 rec = record
+rv = revert --no-backup
 r = pull --rebase --update
+bm = bookmark
+conflicts = resolve -l
+resolved = resolve -m
+st. = st .
+. = summary
+? = compass
+
+# Push only the current branch (like git)
+# http://hgtip.com/tips/advanced/2009-09-28-nudge-a-gentler-push/
+nudge = push --rev .
 
 # Styling Mercurial’s CLI
 # http://hgtip.com/tips/advanced/2010-01-15-styling-mercurials-cli/
-slog = log --style=/home/pcaro/src/mercurial-cli-templates/map-cmdline.slog
-nlog = log --style=/home/pcaro/src/mercurial-cli-templates/map-cmdline.nlog
-sglog = glog --style=/home/pcaro/src/mercurial-cli-templates/map-cmdline.sglog
+slog = log --style=/home/pcaro/programas/mercurial-cli-templates/map-cmdline.slog
+nlog = log --style=/home/pcaro/programas/mercurial-cli-templates/map-cmdline.nlog
+sglog = glog --style=/home/pcaro/programas/mercurial-cli-templates/map-cmdline.sglog
+dlog = glog --style=/home/pcaro/programas/mercurial-cli-templates/map-cmdline.dlog
+
+# Uncommon changesets
+# http://hgtip.com/tips/beginner/2009-12-09-finding-uncommon-changesets/
+# Usage: hg pending feature-X
+pending = slog -r $1:0 -fP .
+
+# patches
+# hg patch http://www.selenic.com/hg/rev/5ca8c111e9aa
+# hg fix 80
+patch = import --no-commit
+fix = export -v -o '%b-%R-%h-%n.patch'
+
+# Changeset information
+# hg show tip
+show = log --color=always -pr
 
 [diff]
 # To make Mercurial produce the git extended diff format
@@ -39,6 +67,19 @@ allow_push = *
 description = pcaro repository
 contact = Pablo Caro correo@pablocaro.es
 
+
+[merge-tools]
+pomerge.priority = 60
+pomerge.premerge = False
+pomerge.args = $local $other $output
+pomerge.executable = pomerge
+
+[merge-patterns]
+**.po = internal:other
+**.mo = internal:other
+**.pdf = internal:other
+** = kdiff3
+
 [extensions]
 
 # The extension list: http://mercurial.selenic.com/wiki/UsingExtensions
@@ -49,6 +90,7 @@ contact = Pablo Caro correo@pablocaro.es
 # In the simplest case, hg fetch acts like hg pull -u -- it pulls changes from a remote repository
 # into a local one and updates the working directory.
 # (This is like the "update" command as found in Subversion or CVS.)
+# In Yaco, with ticket number required in commit message, use "fetch -e"
 hgext.fetch=
 
 # The record extension provides the record command, which may be used in lieu of commit.
@@ -93,6 +135,7 @@ progress =
 
 # Cherrypicking
 # This extension allows you to transplant patches from another branch or repository.
+# The graft command provides similar functionality in Mercurial 2.0 or newer. !!!
 # transplant=
 
 # Show revision history alongside an ASCII revision graph
@@ -110,14 +153,30 @@ pager =
 hgext.churn=
 
 
+# This extension purges all files and directories not being tracked by Mercurial in the current repository.
+# It'll remove unknown files and empty directories by default. With the --all option, it will also remove ignored files
+# To list the files that would be removed: "hg purge --print"
+hgext.purge=
+
+
 ##### NO DISTRIBUIDAS CON MERCURIAL #####
 
+# hgview: qt4 and text based Mercurial log navigator
+# aptitude install hgview
+# http://www.logilab.org/project/hgview
+
+#hgext.hgview = /usr/share/pyshared/hgext/hgview.py
 
 # hgsubversion=~/programas/hgsubversion/hgsubversion
-# hgshelve=~/programas/hgshelve/hgshelve.py
+
+# let you choose which parts of the changes in a working directory you'd like
+# to set aside temporarily
+# https://bitbucket.org/tksoh/hgshelve
+hgshelve = /home/pcaro/programas/hgshelve/hgshelve.py
 
 # Adds the command "hg view"
-hgk=/usr/lib/pymodules/python2.6/hgext/hgk.py
+# hgk is in mercurial-common package
+hgk=/usr/share/pyshared/hgext/hgk.py
 
 # Mercurial git
 # http://hg-git.github.com/
@@ -134,12 +193,35 @@ prompt = /home/pcaro/programas/hg-prompt/prompt.py
 # https://bitbucket.org/yinwm/hgflow/wiki/UserManual
 hgflow = /home/pcaro/programas/hgflow/src/hgflow/hgflow.py
 
+# http://pypi.python.org/pypi/mercurial_keyring/
+# pip install keyring  mercurial_keyring
+# Should pick the most appropriate password backend without configuration.
+# Still, if necessary, it can be configured using ~/keyringrc.cfg
+# mercurial_keyring =
 
-# hgext.mercurial_keyring = /home/pcaro/programas/mercurial_keyring/mercurial_keyring.py
+# Alter messages in local commits
+#  https://bitbucket.org/durin42/histedit
+histedit = /home/pcaro/programas/hg-histedit/hg_histedit.py
 
 # Reposettings
 # http://mercurial.selenic.com/wiki/ReposettingsExtension
+# This extension allows central configuration of multiple repositories using
+# a shared configuration file. Settings can then be applied to specific
+# repositories or sets of repositories.
 reposettings =  /home/pcaro/programas/hg-reposettings/reposettings.py
+
+# hgnested
+# Mercurial extension to work with nested repositories.
+# Allow to apply common Mercurial commands to all the nested repositories at once
+# like pull, push etc.
+# It allow also to fetch a complete tree of repositories through ssh or http.
+# Una alternativa es: Subrepository uso esta por estar recomentada por tryton
+hgnested=
+
+# hg-compass
+# The compass extensions helps to find your way in repositories with multiple heads, branches and bookmarks.
+# It show where you are, where you could be and where you go on update or commit.
+compass = /home/pcaro/programas/hg-compass/compass.py
 
 ##### Opciones de la extensiones #####
 
@@ -155,7 +237,9 @@ delay = 1
 
 [extdiff]
 # add new command called vdiff, runs kdiff3
-cmd.vdiff = kdiff3
+cmd.kompare = kompare
+
+cmd.kdiff3 = kdiff3
 
 # add new command called meld, runs meld (no need to name twice)
 cmd.meld =
@@ -166,7 +250,7 @@ opts.sbsdiff = -N -b --side-by-side --width=90
 
 [pager]
 pager = LESS='FSRX' less
-attend = log, status, diff, annotate, glog, qdiff, cat, help, incoming, outcoming
+attend = log, status, diff, annotate, glog, qdiff, cat, help, incoming, outcoming, sglog, slog, nlog, compass, ?, show, pending
 
 [hooks]
 # They fail with git clone if the source does not pass the hook!
@@ -174,7 +258,7 @@ pretxncommit.pyflakes = python:hghooks.code.pyflakeshook
 pretxncommit.pep8 = python:hghooks.code.pep8hook
 pretxncommit.pdb = python:hghooks.code.pdbhook
 
-pretxncommit.trac = python:yacoticket.ticket_checker
+# pretxncommit.trac = python:yaco.ticket.ticket_checker
 
 [pep8]
 ignore = E501
@@ -188,3 +272,11 @@ pretxncommit.trac =
 [hooks .dotfiles]
 pretxncommit.trac =
 
+[hooks src/trac2rst]
+pretxncommit.trac =
+
+[hooks src/eclipse_workspace/recetas]
+pretxncommit.trac =
+
+[~/src/tangram/tangram-deploy]
+pretxncommit.trac =
