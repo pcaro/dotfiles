@@ -12,3 +12,4 @@ alias grin='grin --follow'
 
 alias sshtyaco='nameTerminal yaco_server; ssh 192.168.13.96'
 alias sshtdemo='nameTerminal yaco_demo;   ssh 82.194.95.94'
+alias dotfiles='dotfiles -C ~/.dotfiles/dotfilesrc'
