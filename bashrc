@@ -68,9 +68,9 @@ if [ "$PS1" ]; then
     # pip bash completion start
     _pip_completion()
     {
-	COMPREPLY=( $( COMP_WORDS="${COMP_WORDS[*]}" \
-		       COMP_CWORD=$COMP_CWORD \
-		       PIP_AUTO_COMPLETE=1 $1 ) )
+        COMPREPLY=( $( COMP_WORDS="${COMP_WORDS[*]}" \
+                   COMP_CWORD=$COMP_CWORD \
+                   PIP_AUTO_COMPLETE=1 $1 ) )
     }
     complete -o default -F _pip_completion pip
     # pip bash completion end
@@ -92,33 +92,25 @@ if [ "$PS1" ]; then
     # To use Distribute with virtualenv
     export VIRTUALENV_USE_DISTRIBUTE=true
 
-    # set PATH so it includes user's private bin if it exists
-    if [ -d /home/chroots/libs/bin ] ; then
-	PATH=/home/chroots/libs/bin:"${PATH}"
-    fi
-
     # rvm es como un virtualenv para ruby
     # http://rvm.beginrescueend.com/
     # [[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm"
 
     # rbenv es menos instrusivo que rvm
     if [ -d $HOME/.rbenv ] ; then
-	export PATH="$HOME/.rbenv/bin:$PATH"
-	eval "$(rbenv init -)"
+        export PATH="$HOME/.rbenv/bin:$PATH"
+        eval "$(rbenv init -)"
     fi
-
 
     # mercurial prompt by hg-prompt
     if [ -f $HOME/.prompt.sh ] ; then
         source $HOME/.prompt.sh
     fi
 
-
-fi
+fi # running interactively
 
 unset JAVA_HOME
 export JAVA_HOME=/usr/lib/jvm/java-6-sun
 unset JDK_HOME
 export JDK_HOME=/usr/lib/jvm/java-6-sun
 
-export PATH=$HOME/local/bin:$PATH
