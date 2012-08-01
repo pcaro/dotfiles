@@ -1,1 +1,6 @@
-Configuration files
+Configuration files.
+
+In transition, we actualy use dotfile-slink.py script but testing dotfiles
+too.
+
+[1] http://pypi.python.org/pypi/dotfiles
