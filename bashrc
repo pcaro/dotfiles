@@ -3,6 +3,26 @@
 # see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
 # for examples
 
+
+# Set terminal title
+# @param string $1  Tab/window title
+# @param string $2  (optional) Separate window title
+ # The latest version of this software can be obtained here:
+# See: http://fvue.nl/wiki/NameTerminal
+function nameTerminal() {
+    [ "${TERM:0:5}" = "xterm" ]   && local ansiNrTab=0
+    [ "$TERM"       = "rxvt" ]    && local ansiNrTab=61
+    [ "$TERM"       = "konsole" ] && local ansiNrTab=30 ansiNrWindow=0
+        # Change tab title
+    [ $ansiNrTab ] && echo -n $'\e'"]$ansiNrTab;$1"$'\a'
+        # If terminal support separate window title, change window title as well
+    [ $ansiNrWindow -a "$2" ] && echo -n $'\e'"]$ansiNrWindow;$2"$'\a'
+    if `qdbus | grep yakuake > /dev/null 2>/dev/null`; then
+        local terminalID=$(qdbus org.kde.yakuake  /yakuake/sessions activeTerminalId );
+        qdbus org.kde.yakuake /yakuake/tabs setTabTitle $((terminalID)) $1
+    fi
+} # nameTerminal()
+
 # If running interactively, then:
 if [ "$PS1" ]; then
 
@@ -15,19 +35,14 @@ if [ "$PS1" ]; then
 
     # enable color support of ls and also add handy aliases
     if [ "$TERM" != "dumb" ]; then
-	eval `dircolors -b`
-	alias ls='ls --color=auto'
+        eval `dircolors -b`
+        alias ls='ls --color=auto'
     fi
 
-    # some more ls aliases
-    alias ll='ls -l -h'
-    alias la='ls -A'
-    alias l='ls -CF'
-    alias rm='rm -i'
-    alias cd..='cd ..'
-    alias svnst='svn st --ignore-externals'
-    alias k='komodo'
-    alias grin='grin --follow'
+    # Aliases
+    if [ -f $HOME/.aliases.sh ] ; then
+        source $HOME/.aliases.sh
+    fi
 
     # set a fancy prompt
     # PS1='\u@\h:\w\$ '
@@ -95,7 +110,7 @@ if [ "$PS1" ]; then
 
     # mercurial prompt by hg-prompt
     if [ -f $HOME/.prompt.sh ] ; then
-	    source $HOME/.prompt.sh
+        source $HOME/.prompt.sh
     fi
 
 
@@ -105,10 +120,5 @@ unset JAVA_HOME
 export JAVA_HOME=/usr/lib/jvm/java-6-sun
 unset JDK_HOME
 export JDK_HOME=/usr/lib/jvm/java-6-sun
-unset M2_HOME
-export M2_HOME=/home/pcaro/programas/apache-maven-3.0.3
 
-# set PATH so it includes user's private bin if it exists
-if [ -d $M2_HOME/bin ] ; then
-    PATH=$M2_HOME/bin:"${PATH}"
-fi
+export PATH=$HOME/local/bin:$PATH

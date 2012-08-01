@@ -6,6 +6,9 @@ syntax: glob
 *~.nib
 *~
 
+settings_local.py
+
+
 build
 
 *.pbxuser
@@ -21,7 +24,7 @@ syntax: glob
 
 build
 
-*.pbxuser
+*.pbxuser'
 *.perspective
 
 .DS_Store
@@ -42,3 +45,7 @@ buildout/eggs/*
 buildout/var/*
 buildout/etc/*
 buildout/bin/*
+.codeintel/*
+yaco.recipe.tangram/*
+
+.ropeproject
