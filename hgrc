@@ -208,7 +208,7 @@ histedit = /home/pcaro/programas/hg-histedit/hg_histedit.py
 # This extension allows central configuration of multiple repositories using
 # a shared configuration file. Settings can then be applied to specific
 # repositories or sets of repositories.
-reposettings =  /home/pcaro/programas/hg-reposettings/reposettings.py
+# reposettings =  /home/pcaro/programas/hg-reposettings/reposettings.py
 
 # hgnested
 # Mercurial extension to work with nested repositories.
@@ -250,7 +250,7 @@ opts.sbsdiff = -N -b --side-by-side --width=90
 
 [pager]
 pager = LESS='FSRX' less
-attend = log, status, diff, annotate, glog, qdiff, cat, help, incoming, outcoming, sglog, slog, nlog, compass, ?, show, pending
+attend = log, status, diff, annotate, glog, qdiff, cat, incoming, outcoming, sglog, slog, nlog, compass, ?, show, pending
 
 [hooks]
 # They fail with git clone if the source does not pass the hook!
@@ -262,21 +262,3 @@ pretxncommit.pdb = python:hghooks.code.pdbhook
 
 [pep8]
 ignore = E501
-
-[reposettings]
-base = /home/pcaro
-
-[hooks src/jspack]
-pretxncommit.trac =
-
-[hooks .dotfiles]
-pretxncommit.trac =
-
-[hooks src/trac2rst]
-pretxncommit.trac =
-
-[hooks src/eclipse_workspace/recetas]
-pretxncommit.trac =
-
-[~/src/tangram/tangram-deploy]
-pretxncommit.trac =
