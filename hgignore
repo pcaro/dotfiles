@@ -1,33 +1,22 @@
 syntax: glob
 
-.DS_Store
-
 *.swp
 *~.nib
 *~
 
 settings_local.py
-
-
 build
 
 *.pbxuser
 *.perspective
 *.perspectivev3
 
-syntax: glob
-
 .DS_Store
-
-*.swp
-*~.nib
-
 build
 
 *.pbxuser'
 *.perspective
 
-.DS_Store
 *.pyc
 *.csproj.user
 *.sublime-project
