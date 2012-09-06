@@ -10,8 +10,9 @@ alias k='komodo'
 alias s='sublime_text'
 alias grin='grin --follow'
 
-alias sshtyaco='nameTerminal yaco_server; ssh 192.168.13.96'
-alias sshtdemo='nameTerminal yaco_demo;   ssh 82.194.95.94'
+alias sshtyaco='nameTerminal YACOSERVER; ssh 192.168.13.96'
+alias sshdemo='nameTerminal DEMO;   ssh 192.168.13.140'
+alias sshdemotf='nameTerminal DEMOTF;   ssh 192.168.13.142'
 alias dotfiles='dotfiles -C ~/.dotfiles/dotfilesrc'
 
 # Mercurial
