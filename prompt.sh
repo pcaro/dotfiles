@@ -51,11 +51,11 @@ function git_current_branch {
 
 function parse_git_dirty {
     status=`git status 2> /dev/null`
-    dirty=`    echo -n "${status}" 2> /dev/null | grep -q "Changed but not updated" 2> /dev/null; echo "$?"`
-    untracked=`echo -n "${status}" 2> /dev/null | grep -q "Untracked files" 2> /dev/null; echo "$?"`
-    ahead=`    echo -n "${status}" 2> /dev/null | grep -q "Your branch is ahead of" 2> /dev/null; echo "$?"`
-    newfile=`  echo -n "${status}" 2> /dev/null | grep -q "new file:" 2> /dev/null; echo "$?"`
-    renamed=`  echo -n "${status}" 2> /dev/null | grep -q "renamed:" 2> /dev/null; echo "$?"`
+    dirty=`    echo -n "${status}" 2> /dev/null | grep -q "Changes not staged for commit" >/dev/null 2> /dev/null; echo "$?"`
+    untracked=`echo -n "${status}" 2> /dev/null | grep -q "Untracked files" >/dev/null 2> /dev/null; echo "$?"`
+    ahead=`    echo -n "${status}" 2> /dev/null | grep -q "Your branch is ahead of" >/dev/null 2> /dev/null; echo "$?"`
+    newfile=`  echo -n "${status}" 2> /dev/null | grep -q "new file:" >/dev/null 2> /dev/null; echo "$?"`
+    renamed=`  echo -n "${status}" 2> /dev/null | grep -q "renamed:" >/dev/null 2> /dev/null; echo "$?"`
     bits=''
     if [ "${dirty}" == "0" ]; then
             bits="${bits}☭"
@@ -64,7 +64,7 @@ function parse_git_dirty {
             bits="${bits}?"
     fi
     if [ "${newfile}" == "0" ]; then
-            bits="${bits}*"
+            bits="${bits}~"
     fi
     if [ "${ahead}" == "0" ]; then
             bits="${bits}+"
