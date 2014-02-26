@@ -1,0 +1,40 @@
+[user]
+	name = Pablo Caro Revuelta
+	email = correo@pablocaro.es
+
+[color]
+	ui = auto
+
+[color]
+	decorate = short
+
+[push]
+	default = simple
+
+[credential]
+	helper = store
+
+[diff]
+	algorithm = patience
+
+[alias]
+	ci = commit
+	di = diff --color-words
+	st = status
+    co = checkout
+
+	# aliases that match the hg in / out commands
+	out      = !git fetch && git log FETCH_HEAD..
+	outgoing = !git fetch && git log FETCH_HEAD..
+	in       = !git fetch && git log ..FETCH_HEAD
+	incoming = !git fetch && git log ..FETCH_HEAD
+    ds = diff --staged
+    ##  you forget to include a file with your last commit
+    amend = commit --amend -C HEAD
+    undo = reset --soft HEAD^
+    # great for reviewing what you worked on yesterday
+    standup = log --since '1 day ago' --oneline --author <correo@pablocaro.es>
+    graph = log --graph --pretty=format':%C(yellow)%h%Cblue%d%Creset %s %C(white) %an, %ar%Creset'
+
+    meld =  mergetool -t meld
+    kdiff =  mergetool -t kdiff3
