@@ -10,7 +10,8 @@ ssh = ssh -C
 [auth]
 yaco.prefix = hg.yaco.es
 yaco.username = pcaro
-yaco.schemes = https
+# yaco.password = SECRET
+# yaco.schemes = https
 
 bitbucket.prefix = bitbucket.org
 bitbucket.username = pcaro
@@ -164,34 +165,36 @@ hgext.purge=
 # hgview: qt4 and text based Mercurial log navigator
 # aptitude install hgview
 # http://www.logilab.org/project/hgview
+# Usa el comando hgview
 
-#hgext.hgview = /usr/share/pyshared/hgext/hgview.py
 
 # hgsubversion=~/programas/hgsubversion/hgsubversion
 
 # let you choose which parts of the changes in a working directory you'd like
 # to set aside temporarily
 # https://bitbucket.org/tksoh/hgshelve
-hgshelve = /home/pcaro/programas/hgshelve/hgshelve.py
+hgshelve =
 
 # Adds the command "hg view"
 # hgk is in mercurial-common package
-hgk=/usr/share/pyshared/hgext/hgk.py
+hgk=
 
 # Mercurial git
 # http://hg-git.github.com/
 # sudo aptitude install mercurial-git
 # bookmarks extension is recomended
-hggit = /home/pcaro/programas/hg-git/hggit
+hggit =
 
 # hg-prompt
 # http://stevelosh.com/projects/hg-prompt/
+# Y have a fork
+# https://bitbucket.org/pcaro/hg-prompt
 prompt = /home/pcaro/programas/hg-prompt/prompt.py
 
 
 # hgflow
 # https://bitbucket.org/yinwm/hgflow/wiki/UserManual
-hgflow = /home/pcaro/programas/hgflow/src/hgflow/hgflow.py
+# hgflow = /home/pcaro/programas/hgflow/src/hgflow/hgflow.py
 
 # http://pypi.python.org/pypi/mercurial_keyring/
 # pip install keyring  mercurial_keyring
@@ -201,7 +204,7 @@ hgflow = /home/pcaro/programas/hgflow/src/hgflow/hgflow.py
 
 # Alter messages in local commits
 #  https://bitbucket.org/durin42/histedit
-histedit = /home/pcaro/programas/hg-histedit/hg_histedit.py
+# histedit = /home/pcaro/programas/hg-histedit/hg_histedit.py
 
 # Reposettings
 # http://mercurial.selenic.com/wiki/ReposettingsExtension
@@ -254,11 +257,11 @@ attend = log, status, diff, annotate, glog, qdiff, cat, incoming, outcoming, sgl
 
 [hooks]
 # They fail with git clone if the source does not pass the hook!
-pretxncommit.pyflakes = python:hghooks.code.pyflakeshook
-pretxncommit.pep8 = python:hghooks.code.pep8hook
-pretxncommit.pdb = python:hghooks.code.pdbhook
-
+# pretxncommit.pyflakes = python:hghooks.code.pyflakeshook
+# pretxncommit.pep8 = python:hghooks.code.pep8hook
+# pretxncommit.pdb = python:hghooks.code.pdbhook
+# pretxncommit.jslint = python:hghooks.code.jslinthook
 # pretxncommit.trac = python:yaco.ticket.ticket_checker
 
 [pep8]
-ignore = E501
+ignore = E501 E122 E128

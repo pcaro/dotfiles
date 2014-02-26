@@ -48,12 +48,9 @@ if [ "$PS1" ]; then
     # PS1='\u@\h:\w\$ '
     PS1='\[\033[01;34m\](\[\033[01;31m\]\w\[\033[01;34m\])\n\[\e[0;31m\]\u\[\e[0;37m\]@\[\e[0;33m\]\h\[\e[0;0m\]\$ '
     # set PATH so it includes user's private bin if it exists
+    PATH=/usr/sbin:"${PATH}"
     if [ -d ~/bin ] ; then
-        PATH=~/bin:"${PATH}"
-    fi
-
-    if [ -d ~/src/devUtils_out/bin ] ; then
-        PATH=~/src/devUtils_out/bin:"${PATH}"
+        PATH=~/bin:"${PATH}":/sbin
     fi
 
     EDITOR=jed
@@ -76,7 +73,10 @@ if [ "$PS1" ]; then
     # pip bash completion end
 
     # Virtualenvwrapper modified v function
-    source $HOME/.v_function
+    # source $HOME/.v_function
+
+    export WORKON_HOME=$HOME/.virtualenvs
+    source /usr/bin/virtualenvwrapper.sh
 
     # up function
     source $HOME/.up_function.sh
@@ -88,9 +88,15 @@ if [ "$PS1" ]; then
     # export PIP_REQUIRE_VIRTUALENV=true
     # To tell pip to automatically use the currently active virtualenv
     export PIP_RESPECT_VIRTUALENV=true
+    export PIP_VIRTUALENV_BASE=$WORKON_HOME
+
+    # export PYTHONSTARTUP=~/.pythonrc.py
 
     # To use Distribute with virtualenv
     export VIRTUALENV_USE_DISTRIBUTE=true
+
+    # pythonbrew
+    # [[ -s $HOME/.pythonbrew/etc/bashrc ]] && source $HOME/.pythonbrew/etc/bashrc
 
     # rvm es como un virtualenv para ruby
     # http://rvm.beginrescueend.com/
@@ -109,8 +115,14 @@ if [ "$PS1" ]; then
 
 fi # running interactively
 
-unset JAVA_HOME
-export JAVA_HOME=/usr/lib/jvm/java-6-sun
-unset JDK_HOME
-export JDK_HOME=/usr/lib/jvm/java-6-sun
+# unset JAVA_HOME
+# export JAVA_HOME=/usr/lib/jvm/java-6-sun
+# unset JDK_HOME
+# export JDK_HOME=/usr/lib/jvm/java-6-sun
 
+export JAVA_ROOT=/usr/lib64/jdk_Oracle
+export JAVA_HOME=/usr/lib64/jdk_Oracle
+export JDK_HOME=/usr/lib64/jdk_Oracle
+export JAVA_BINDIR=/usr/lib64/jdk_Oracle/bin
+export JRE_HOME=/usr/lib64/jdk_Oracle/jre
+export XAUTHORITY=$HOME/.Xauthority
