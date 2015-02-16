@@ -46,7 +46,7 @@ if [ "$PS1" ]; then
 
     # set a fancy prompt
     # PS1='\u@\h:\w\$ '
-    PS1='\[\033[01;34m\](\[\033[01;31m\]\w\[\033[01;34m\])\n\[\e[0;31m\]\u\[\e[0;37m\]@\[\e[0;33m\]\h\[\e[0;0m\]\$ '
+    #PS1='\[\033[01;34m\](\[\033[01;31m\]\w\[\033[01;34m\])\n\[\e[0;31m\]\u\[\e[0;37m\]@\[\e[0;33m\]\h\[\e[0;0m\]\$ '
     # set PATH so it includes user's private bin if it exists
     PATH=/usr/sbin:"${PATH}"
     if [ -d ~/bin ] ; then
@@ -108,9 +108,21 @@ if [ "$PS1" ]; then
         eval "$(rbenv init -)"
     fi
 
+    # pipsi
+    if [ -d $HOME/.local/bin ] ; then
+        export PATH=~/.local/bin:$PATH
+    fi
+
     # mercurial prompt by hg-prompt
-    if [ -f $HOME/.prompt.sh ] ; then
-        source $HOME/.prompt.sh
+    # if [ -f $HOME/.prompt.sh ] ; then
+    #     source $HOME/.prompt.sh
+    # fi
+    # https://github.com/magicmonty/bash-git-prompt/
+    GIT_PROMPT_THEME=Default_NoExitState_Ubuntu
+    source ~/.bash-git-prompt/gitprompt.sh
+
+    if [ -d $HOME/.dotenv/git-flow-completion.bash ] ; then
+        source $HOME/.dotenv/git-flow-completion.bash
     fi
 
 fi # running interactively
@@ -126,3 +138,11 @@ export JDK_HOME=/usr/lib64/jdk_Oracle
 export JAVA_BINDIR=/usr/lib64/jdk_Oracle/bin
 export JRE_HOME=/usr/lib64/jdk_Oracle/jre
 export XAUTHORITY=$HOME/.Xauthority
+export GRIN_ARGS="--follow --skip-dirs CVS,RCS,.svn,.hg,.bzr,build,dist,migrations"
+
+#Keep chrome/firefox cache in ram
+export XDG_CACHE_HOME=/tmp/pcaro/dotcache
+if [ ! -f $XDG_CACHE_HOME ];
+then
+    mkdir -p -m 0700 $XDG_CACHE_HOME
+fi
