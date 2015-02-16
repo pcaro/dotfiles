@@ -1,267 +1,96 @@
-# http://mercurial.selenic.com/wiki/TipsAndTricks
 [ui]
-username = pcaro
-# username = Pablo Caro <correo@pablocaro.es>
-ignore = ~/.hgignore
-# Enabling compression can speed up things drastically
-ssh = ssh -C
-
+username=correo@pablocaro.es
+ignore=~/.hgignore
+ssh=ssh -C
 
 [auth]
-yaco.prefix = hg.yaco.es
-yaco.username = pcaro
-# yaco.password = SECRET
-# yaco.schemes = https
-
-bitbucket.prefix = bitbucket.org
-bitbucket.username = pcaro
+yaco.prefix=hg.yaco.es
+yaco.username=pcaro
+bitbucket.prefix=bitbucket.org
+bitbucket.username=pcaro
 
 [alias]
-help = help -v
-blame = annotate -u -n
-rec = record
-rv = revert --no-backup
-r = pull --rebase --update
-bm = bookmark
-conflicts = resolve -l
-resolved = resolve -m
-st. = st .
-. = summary
-? = compass
-
-# Push only the current branch (like git)
-# http://hgtip.com/tips/advanced/2009-09-28-nudge-a-gentler-push/
-nudge = push --rev .
-
-# Styling Mercurial’s CLI
-# http://hgtip.com/tips/advanced/2010-01-15-styling-mercurials-cli/
-slog = log --style=/home/pcaro/programas/mercurial-cli-templates/map-cmdline.slog
-nlog = log --style=/home/pcaro/programas/mercurial-cli-templates/map-cmdline.nlog
-sglog = glog --style=/home/pcaro/programas/mercurial-cli-templates/map-cmdline.sglog
-dlog = glog --style=/home/pcaro/programas/mercurial-cli-templates/map-cmdline.dlog
-
-# Uncommon changesets
-# http://hgtip.com/tips/beginner/2009-12-09-finding-uncommon-changesets/
-# Usage: hg pending feature-X
-pending = slog -r $1:0 -fP .
-
-# patches
-# hg patch http://www.selenic.com/hg/rev/5ca8c111e9aa
-# hg fix 80
-patch = import --no-commit
-fix = export -v -o '%b-%R-%h-%n.patch'
-
-# Changeset information
-# hg show tip
-show = log --color=always -pr
+help=help -v
+blame=annotate -u -n
+rec=record
+rv=revert --no-backup
+r=pull --rebase --update
+bm=bookmark
+conflicts=resolve -l
+resolved=resolve -m
+st.=st .
+.=summary
+?=compass
+nudge=push --rev .
+slog=log --style=/home/pcaro/programas/mercurial-cli-templates/map-cmdline.slog
+nlog=log --style=/home/pcaro/programas/mercurial-cli-templates/map-cmdline.nlog
+sglog=glog --style=/home/pcaro/programas/mercurial-cli-templates/map-cmdline.sglog
+dlog=glog --style=/home/pcaro/programas/mercurial-cli-templates/map-cmdline.dlog
+pending=slog -r $1:0 -fP .
+patch=import --no-commit
+fix=export -v -o '%b-%R-%h-%n.patch'
+show=log --color=always -pr
 
 [diff]
-# To make Mercurial produce the git extended diff format
-# hg help diffs
 git=True
 
-
 [web]
-style = gitweb
-allow_archive = gz, zip, bz2
-allow_push = *
-description = pcaro repository
-contact = Pablo Caro correo@pablocaro.es
-
+style=gitweb
+allow_archive=gz, zip, bz2
+allow_push=*
+description=pcaro repository
+contact=Pablo Caro correo@pablocaro.es
 
 [merge-tools]
-pomerge.priority = 60
-pomerge.premerge = False
-pomerge.args = $local $other $output
-pomerge.executable = pomerge
+pomerge.priority=60
+pomerge.premerge=False
+pomerge.args=$local $other $output
+pomerge.executable=pomerge
 
 [merge-patterns]
-**.po = internal:other
-**.mo = internal:other
-**.pdf = internal:other
-** = kdiff3
+**.po=internal:other
+**.mo=internal:other
+**.pdf=internal:other
+**=kdiff3
 
 [extensions]
-
-# The extension list: http://mercurial.selenic.com/wiki/UsingExtensions
-
-##### DISTRIBUDAS CON MERCURIAL #####
-
-# This extension is a convenience wrapper.
-# In the simplest case, hg fetch acts like hg pull -u -- it pulls changes from a remote repository
-# into a local one and updates the working directory.
-# (This is like the "update" command as found in Subversion or CVS.)
-# In Yaco, with ticket number required in commit message, use "fetch -e"
 hgext.fetch=
-
-# The record extension provides the record command, which may be used in lieu of commit.
-# This command lets you choose which parts of the changes in a working directory you'd like to commit, at the granularity of patch hunks.
-# The record extension also provides the qrecord command, if MqExtension is enabled.
 hgext.record=
-
-# This extension add color to several mercurial outputs
 color=
-
-# The extdiff Mercurial extension allows you to use external programs to compare revisions, or revision with working dir
 hgext.extdiff=
-
-# When contributing to a project, sometimes there is the need to keep some patches private, while keeping the whole repository up-to-date.
-# In those cases it can be useful to "detach" the local changes,
-# synchronize the repository with the mainstream and then append the private changes on top of the new remote changes.
-# This operation is called rebase.
-rebase =
-
-
-# Bookmarks are markers on commits that move on commit
-# If you do hg bookmark feature the feature bookmark refers to the current changeset.
-# As you work and commit changes the bookmark will move forward with every commit you do.
-# Usefull to:
-# * keep track of different heads
-# * Trying out new features or pulling changes that have yet to be reviewed
-# * Access the commit:  wherever a command takes -r revision, revision can be a bookmark name
-# * Merge and update bookmarks by their names
-bookmarks =
-
-
-# Mercurial Patch Queues - manage changes as series of patches
-# see: http://mercurial.selenic.com/wiki/MqTutorial
-mq =
-
-# Convert repositories from other SCMs into Mercurial
-convert =
-
-# This extension uses the progress information logged by hg commands to draw
-# progress bars that are as informative as possible
-progress =
-
-# Cherrypicking
-# This extension allows you to transplant patches from another branch or repository.
-# The graft command provides similar functionality in Mercurial 2.0 or newer. !!!
-# transplant=
-
-# Show revision history alongside an ASCII revision graph
-# This extension adds a new command "glog" that behaves
-# like (a subset of) the normal log command except that it also prints
-# a graph representing the revision history using ASCII characters to the left of the log.
-hgext.graphlog =
-
-# Browse command output using an external pager
-# View section for configuration
-pager =
-
-# This extension adds the churn command which creates a graph
-# showing the number of line changes per user for a given repository or file.
+rebase=
+bookmarks=
+mq=
+convert=
+progress=
+hgext.graphlog=
+pager=
 hgext.churn=
-
-
-# This extension purges all files and directories not being tracked by Mercurial in the current repository.
-# It'll remove unknown files and empty directories by default. With the --all option, it will also remove ignored files
-# To list the files that would be removed: "hg purge --print"
 hgext.purge=
-
-
-##### NO DISTRIBUIDAS CON MERCURIAL #####
-
-# hgview: qt4 and text based Mercurial log navigator
-# aptitude install hgview
-# http://www.logilab.org/project/hgview
-# Usa el comando hgview
-
-
-# hgsubversion=~/programas/hgsubversion/hgsubversion
-
-# let you choose which parts of the changes in a working directory you'd like
-# to set aside temporarily
-# https://bitbucket.org/tksoh/hgshelve
-hgshelve =
-
-# Adds the command "hg view"
-# hgk is in mercurial-common package
+hgshelve=
 hgk=
-
-# Mercurial git
-# http://hg-git.github.com/
-# sudo aptitude install mercurial-git
-# bookmarks extension is recomended
-hggit =
-
-# hg-prompt
-# http://stevelosh.com/projects/hg-prompt/
-# Y have a fork
-# https://bitbucket.org/pcaro/hg-prompt
-prompt = /home/pcaro/programas/hg-prompt/prompt.py
-
-
-# hgflow
-# https://bitbucket.org/yinwm/hgflow/wiki/UserManual
-# hgflow = /home/pcaro/programas/hgflow/src/hgflow/hgflow.py
-
-# http://pypi.python.org/pypi/mercurial_keyring/
-# pip install keyring  mercurial_keyring
-# Should pick the most appropriate password backend without configuration.
-# Still, if necessary, it can be configured using ~/keyringrc.cfg
-# mercurial_keyring =
-
-# Alter messages in local commits
-#  https://bitbucket.org/durin42/histedit
-# histedit = /home/pcaro/programas/hg-histedit/hg_histedit.py
-
-# Reposettings
-# http://mercurial.selenic.com/wiki/ReposettingsExtension
-# This extension allows central configuration of multiple repositories using
-# a shared configuration file. Settings can then be applied to specific
-# repositories or sets of repositories.
-# reposettings =  /home/pcaro/programas/hg-reposettings/reposettings.py
-
-# hgnested
-# Mercurial extension to work with nested repositories.
-# Allow to apply common Mercurial commands to all the nested repositories at once
-# like pull, push etc.
-# It allow also to fetch a complete tree of repositories through ssh or http.
-# Una alternativa es: Subrepository uso esta por estar recomentada por tryton
+hggit=
+prompt=/home/pcaro/programas/hg-prompt/prompt.py
 hgnested=
-
-# hg-compass
-# The compass extensions helps to find your way in repositories with multiple heads, branches and bookmarks.
-# It show where you are, where you could be and where you go on update or commit.
-compass = /home/pcaro/programas/hg-compass/compass.py
-
-##### Opciones de la extensiones #####
+compass=/home/pcaro/programas/hg-compass/compass.py
 
 [bookmarks]
-# By default, when several bookmarks point to the same changeset, they will all move forward together.
-# This will cause Mercurial to only track and update the currently active bookmark.
-# This is similar to Git's approach to branching
-track.current = True
+track.current=True
 
 [progress]
-# number of seconds (float) before showing the progress bar
-delay = 1
+delay=1
 
 [extdiff]
-# add new command called vdiff, runs kdiff3
-cmd.kompare = kompare
-
-cmd.kdiff3 = kdiff3
-
-# add new command called meld, runs meld (no need to name twice)
-cmd.meld =
-
-# Side by side diff
-cmd.sbsdiff  = diff
-opts.sbsdiff = -N -b --side-by-side --width=90
+cmd.kompare=kompare
+cmd.kdiff3=kdiff3
+cmd.meld=
+cmd.sbsdiff=diff
+opts.sbsdiff=-N -b --side-by-side --width=90
 
 [pager]
-pager = LESS='FSRX' less
-attend = log, status, diff, annotate, glog, qdiff, cat, incoming, outcoming, sglog, slog, nlog, compass, ?, show, pending
-
-[hooks]
-# They fail with git clone if the source does not pass the hook!
-# pretxncommit.pyflakes = python:hghooks.code.pyflakeshook
-# pretxncommit.pep8 = python:hghooks.code.pep8hook
-# pretxncommit.pdb = python:hghooks.code.pdbhook
-# pretxncommit.jslint = python:hghooks.code.jslinthook
-# pretxncommit.trac = python:yaco.ticket.ticket_checker
+pager=LESS='FSRX' less
+attend=log, status, diff, annotate, glog, qdiff, cat, incoming, outcoming, sglog, slog, nlog, compass, ?, show, pending
 
 [pep8]
-ignore = E501 E122 E128
+ignore=E501 E122 E128
+

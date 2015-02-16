@@ -29,6 +29,7 @@
     in       = !git fetch && git log ..FETCH_HEAD
     incoming = !git fetch && git log ..FETCH_HEAD
     ds = diff --staged
+    diffst = diff --staged
     ##  you forget to include a file with your last commit
     amend = commit --amend -C HEAD
     undo = reset --soft HEAD^
