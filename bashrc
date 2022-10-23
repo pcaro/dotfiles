@@ -44,6 +44,11 @@ if [ "$PS1" ]; then
         source $HOME/.aliases.sh
     fi
 
+    # Aliases local
+    if [ -f $HOME/.aliases_local.sh ] ; then
+        source $HOME/.aliases_local.sh
+    fi
+    
     # set a fancy prompt
     # PS1='\u@\h:\w\$ '
     #PS1='\[\033[01;34m\](\[\033[01;31m\]\w\[\033[01;34m\])\n\[\e[0;31m\]\u\[\e[0;37m\]@\[\e[0;33m\]\h\[\e[0;0m\]\$ '
@@ -53,7 +58,8 @@ if [ "$PS1" ]; then
         PATH=~/bin:"${PATH}":/sbin
     fi
 
-    EDITOR=jed
+
+    EDITOR=nano
     export EDITOR
 
     # enable programmable completion features (you don't need to enable
@@ -75,8 +81,8 @@ if [ "$PS1" ]; then
     # Virtualenvwrapper modified v function
     # source $HOME/.v_function
 
-    export WORKON_HOME=$HOME/.virtualenvs
-    source /usr/bin/virtualenvwrapper.sh
+    # export WORKON_HOME=$HOME/.virtualenvs
+    # source /usr/bin/virtualenvwrapper.sh
 
     # up function
     source $HOME/.up_function.sh
@@ -108,7 +114,7 @@ if [ "$PS1" ]; then
         eval "$(rbenv init -)"
     fi
 
-    # pipsi
+    # pipsi an other like poetry
     if [ -d $HOME/.local/bin ] ; then
         export PATH=~/.local/bin:$PATH
     fi
@@ -124,6 +130,7 @@ if [ "$PS1" ]; then
     if [ -d $HOME/.dotenv/git-flow-completion.bash ] ; then
         source $HOME/.dotenv/git-flow-completion.bash
     fi
+    eval "$(direnv hook bash)"
 
 fi # running interactively
 
@@ -141,8 +148,21 @@ export XAUTHORITY=$HOME/.Xauthority
 export GRIN_ARGS="--follow --skip-dirs CVS,RCS,.svn,.hg,.bzr,build,dist,migrations"
 
 #Keep chrome/firefox cache in ram
-export XDG_CACHE_HOME=/tmp/pcaro/dotcache
+# export XDG_CACHE_HOME=/tmp/pcaro/dotcache
 if [ ! -f $XDG_CACHE_HOME ];
 then
     mkdir -p -m 0700 $XDG_CACHE_HOME
 fi
+
+[ -f ~/.fzf.bash ] && source ~/.fzf.bash
+
+export PYENV_ROOT="$HOME/.pyenv"
+if [ -z "$PYENV_INITIALIZED" ]; then
+    export PATH="$PYENV_ROOT/bin:$PATH"
+    eval "$(pyenv init -)"
+fi
+
+export GOOGLE_APPLICATION_CREDENTIALS=$HOME/.sa_xy_italy.json
+# fnm
+export PATH=/home/pcaro/.fnm:$PATH
+eval "`fnm env --use-on-cd`"

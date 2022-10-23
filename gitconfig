@@ -2,6 +2,13 @@
     name = Pablo Caro Revuelta
     email = correo@pablocaro.es
 
+[core]
+    editor = nano
+    filemode = true
+    whitespace = trailing-space, tab-in-indent, tabwidth=4
+	pager = diff-so-fancy | less --tabs=4 -RFX
+
+
 [color]
     ui = auto
 
@@ -17,11 +24,27 @@
 [diff]
     algorithm = patience
 
+[status]
+    showStash = true
+
 [alias]
     ci = commit
     di = diff --color-words
     st = status
     co = checkout
+
+    root = rev-parse --show-toplevel
+    not-pushed = log --branches --not --remotes
+    # url of origin, about 99% of what I use git config --list for
+    cloneurl = config --get remote.origin.url
+    branch-name = "!git symbolic-ref --short HEAD"
+    show-stashed = stash show stash@{0} -p
+    stash-list = stash list --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
+    stash-pull-pop = "!fnc(){ git stash; git pull origin $(git rev-parse --abbrev-ref HEAD); git stash pop;  }; fnc"
+    unstage = restore --staged
+
+    # Clone a repository including all submodules
+    clone-everything = clone --recursive --progress
 
     # aliases that match the hg in / out commands
     out      = !git fetch && git log FETCH_HEAD..
@@ -30,12 +53,38 @@
     incoming = !git fetch && git log ..FETCH_HEAD
     ds = diff --staged
     diffst = diff --staged
+
     ##  you forget to include a file with your last commit
     amend = commit --amend -C HEAD
-    undo = reset --soft HEAD^
-    # great for reviewing what you worked on yesterday
+
+    uncommit = reset --soft HEAD~1
+
     standup = log --since '1 day ago' --oneline --author <correo@pablocaro.es>
     graph = log --graph --pretty=format':%C(yellow)%h%Cblue%d%Creset %s %C(white) %an, %ar%Creset'
 
+    save  = "!git commit --no-verify -a -m \"WIP: auto save at $(date '+%Y%m%d %H:%M:%S')\""
+    # Put any file changed up for commits
+    addr = "!fnc(){ git add $(git status | grep "modificados:" | cut -f2 -d ":" | xargs); }; fnc"
+
+    fetch-all-branches = "!func() { \
+        git checkout --detach && git fetch origin '+refs/heads/*:refs/heads/*';\
+        };func"
+
+    cleanup-branches = "!func() { \
+        git fetch -pa && \
+        git branch --merged | egrep -v '(^\\*|master|dev|devel|staging|main|develop)' | xargs git branch -d  >/dev/null 2>&1;\
+        };func"
+
+    new-common-branch = "!func() { \
+        git checkout -b $1 $(git merge-base master dev staging);\
+        };func"
+
     meld =  mergetool -t meld
     kdiff =  mergetool -t kdiff3
+
+[merge]
+	tool = meld
+
+[advice]
+	addIgnoredFile = false
+
