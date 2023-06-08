@@ -41,6 +41,8 @@
     show-stashed = stash show stash@{0} -p
     stash-list = stash list --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
     stash-pull-pop = "!fnc(){ git stash; git pull origin $(git rev-parse --abbrev-ref HEAD); git stash pop;  }; fnc"
+    go-stashing = "!fnc(){ git stash; git checkout $1; git pull; git stash pop;  }; fnc"
+
     unstage = restore --staged
 
     # Clone a repository including all submodules

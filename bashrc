@@ -163,6 +163,14 @@ if [ -z "$PYENV_INITIALIZED" ]; then
 fi
 
 export GOOGLE_APPLICATION_CREDENTIALS=$HOME/.sa_xy_italy.json
+export USE_GKE_GCLOUD_AUTH_PLUGIN=True
+
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
 # fnm
-export PATH=/home/pcaro/.fnm:$PATH
-eval "`fnm env --use-on-cd`"
+# export PATH=/home/pcaro/.fnm:$PATH
+# eval "`fnm env --use-on-cd`"
+
+
