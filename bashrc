@@ -23,6 +23,16 @@ function nameTerminal() {
     fi
 } # nameTerminal()
 
+# Usage example
+# files-to-prompt utils.ts | to_clip "Algo extra"
+# Paste on LLM
+function to_clip() {
+    local message="${1:-"Por favor, proporciona el mensaje adicional"}"
+    { cat; echo "$message"; } | xclip -sel clip
+}
+
+
+
 # If running interactively, then:
 if [ "$PS1" ]; then
 
@@ -48,7 +58,7 @@ if [ "$PS1" ]; then
     if [ -f $HOME/.aliases_local.sh ] ; then
         source $HOME/.aliases_local.sh
     fi
-    
+
     # set a fancy prompt
     # PS1='\u@\h:\w\$ '
     #PS1='\[\033[01;34m\](\[\033[01;31m\]\w\[\033[01;34m\])\n\[\e[0;31m\]\u\[\e[0;37m\]@\[\e[0;33m\]\h\[\e[0;0m\]\$ '
@@ -68,13 +78,11 @@ if [ "$PS1" ]; then
       . /etc/bash_completion
     fi
 
-    # pip bash completion start
-    _pip_completion()
-    {
-        COMPREPLY=( $( COMP_WORDS="${COMP_WORDS[*]}" \
-                   COMP_CWORD=$COMP_CWORD \
-                   PIP_AUTO_COMPLETE=1 $1 ) )
-    }
+    if [ -f $HOME/.bash_completion ]; then
+      . $HOME/bash_completion
+    fi
+
+
     complete -o default -F _pip_completion pip
     # pip bash completion end
 
@@ -108,15 +116,18 @@ if [ "$PS1" ]; then
     # http://rvm.beginrescueend.com/
     # [[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm"
 
-    # rbenv es menos instrusivo que rvm
+    # rbenv es menos instrusivo que rvm (RUBY)
     if [ -d $HOME/.rbenv ] ; then
         export PATH="$HOME/.rbenv/bin:$PATH"
         eval "$(rbenv init -)"
     fi
 
-    # pipsi an other like poetry
     if [ -d $HOME/.local/bin ] ; then
         export PATH=~/.local/bin:$PATH
+    fi
+
+    if [ -d $HOME/.diff-so-fancy ] ; then
+        export PATH=~/.diff-so-fancy:$PATH
     fi
 
     # mercurial prompt by hg-prompt
@@ -132,6 +143,8 @@ if [ "$PS1" ]; then
     fi
     eval "$(direnv hook bash)"
 
+    eval "$(uv generate-shell-completion bash)"
+
 fi # running interactively
 
 # unset JAVA_HOME
@@ -139,11 +152,11 @@ fi # running interactively
 # unset JDK_HOME
 # export JDK_HOME=/usr/lib/jvm/java-6-sun
 
-export JAVA_ROOT=/usr/lib64/jdk_Oracle
-export JAVA_HOME=/usr/lib64/jdk_Oracle
-export JDK_HOME=/usr/lib64/jdk_Oracle
-export JAVA_BINDIR=/usr/lib64/jdk_Oracle/bin
-export JRE_HOME=/usr/lib64/jdk_Oracle/jre
+# export JAVA_ROOT=/usr/lib64/jdk_Oracle
+# export JAVA_HOME=/usr/lib64/jdk_Oracle
+# export JDK_HOME=/usr/lib64/jdk_Oracle
+# export JAVA_BINDIR=/usr/lib64/jdk_Oracle/bin
+# export JRE_HOME=/usr/lib64/jdk_Oracle/jre
 export XAUTHORITY=$HOME/.Xauthority
 export GRIN_ARGS="--follow --skip-dirs CVS,RCS,.svn,.hg,.bzr,build,dist,migrations"
 
@@ -156,21 +169,43 @@ fi
 
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
 
-export PYENV_ROOT="$HOME/.pyenv"
-if [ -z "$PYENV_INITIALIZED" ]; then
-    export PATH="$PYENV_ROOT/bin:$PATH"
-    eval "$(pyenv init -)"
-fi
+# I am using rye instead of pyenv
+# export PYENV_ROOT="$HOME/.pyenv"
+# if [ -z "$PYENV_INITIALIZED" ]; then
+#     export PATH="$PYENV_ROOT/bin:$PATH"
+#     eval "$(pyenv init -)"
+# fi
 
-export GOOGLE_APPLICATION_CREDENTIALS=$HOME/.sa_xy_italy.json
+# export GOOGLE_APPLICATION_CREDENTIALS=$HOME/.sa_xy_italy.json
 export USE_GKE_GCLOUD_AUTH_PLUGIN=True
 
-export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+# export NVM_DIR="$HOME/.nvm"
+# [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+# [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
 # fnm
-# export PATH=/home/pcaro/.fnm:$PATH
-# eval "`fnm env --use-on-cd`"
+export PATH=/home/pcaro/.fnm:$PATH
+eval "`fnm env --use-on-cd --version-file-strategy=recursive --resolve-engines`"
 
 
+# rye is a project and package management solution for Python
+# But now I am using uv
+#if [ -d $HOME/.rye/shims ] ; then
+#    source "$HOME/.rye/env"
+#fi
+
+# CSS utilities
+if [ -f $HOME/.css.sh ] ; then
+    source "$HOME/.css.sh"
+fi
+
+# potry/rye alternative for python uv
+. "$HOME/.cargo/env"
+
+# pnpm
+export PNPM_HOME="/home/pcaro/.local/share/pnpm"
+case ":$PATH:" in
+  *":$PNPM_HOME:"*) ;;
+  *) export PATH="$PNPM_HOME:$PATH" ;;
+esac
+# pnpm end

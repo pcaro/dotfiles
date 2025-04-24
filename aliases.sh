@@ -29,11 +29,16 @@ alias rm='rm -i'
 alias cd..='cd ..'
 # alias s='code --enable-features=UseOzonePlatform --ozone-platform=wayland'
 # alias sgo='code  --enable-features=UseOzonePlatform --ozone-platform=wayland -g'
-alias s='code-insiders'
-alias sgo='code-insiders  -g'
+alias s='cursor'
+alias sgo='code  -g'
 alias busca='fd'
 alias fd='fdfind'
 alias bat='batcat'
+alias batp='batcat -p'
+alias agsql='ag --sql'
+alias agpy='ag --python'
+alias agmd='ag --markdown'
+alias agi='ag -i'
 
 # Enables forwarding of the authentication agent connection.
 alias sshpro='eval `ssh-agent`;ssh-add'
@@ -91,5 +96,28 @@ alias ports='netstat -tulanp'
 alias ports-listen='sudo lsof -nP -iTCP -sTCP:LISTEN'
 
 
-
 alias glogin='echo "gcloud container clusters get-credentials carto --zone europe-west1-b --project geographica-gs"; gcloud container clusters get-credentials carto --zone europe-west1-b --project geographica-gs'
+
+
+# Function to find and execute the latest AppImage of a program in ~/bin (using ls)
+execute_latest_appimage() {
+  local program="$1"
+  local directory="$HOME/bin"
+  local latest_appimage=""
+
+  # List AppImage files, sort by modification time (newest first), and get the first one
+  latest_appimage=$(ls -t "$directory"/*"$program"*.AppImage 2>/dev/null | head -n 1)
+
+  if [ -n "$latest_appimage" ] && [ -f "$latest_appimage" ]; then
+    echo "Executing latest version of $program: $latest_appimage"
+    chmod +x "$latest_appimage"
+    "$latest_appimage" "${@:2}"
+  else
+    echo "No AppImage files found for '$program' in $directory."
+    return 1
+  fi
+}
+
+# Define an alias for the 'cursor' program
+alias cursor='execute_latest_appimage cursor'
+
