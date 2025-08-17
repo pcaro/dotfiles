@@ -143,6 +143,10 @@ if [ "$PS1" ]; then
     fi
     eval "$(direnv hook bash)"
 
+    # fnm
+    export PATH=/home/pcaro/.fnm:$PATH
+    eval "`fnm env --version-file-strategy=recursive --resolve-engines`"
+    
     eval "$(uv generate-shell-completion bash)"
 
 fi # running interactively
@@ -174,7 +178,9 @@ fi
 # if [ -z "$PYENV_INITIALIZED" ]; then
 #     export PATH="$PYENV_ROOT/bin:$PATH"
 #     eval "$(pyenv init -)"
-# fi
+# fi# fnm
+export PATH=/home/pcaro/.fnm:$PATH
+eval "`fnm env --use-on-cd --version-file-strategy=recursive --resolve-engines`"
 
 # export GOOGLE_APPLICATION_CREDENTIALS=$HOME/.sa_xy_italy.json
 export USE_GKE_GCLOUD_AUTH_PLUGIN=True
@@ -182,10 +188,6 @@ export USE_GKE_GCLOUD_AUTH_PLUGIN=True
 # export NVM_DIR="$HOME/.nvm"
 # [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 # [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-
-# fnm
-export PATH=/home/pcaro/.fnm:$PATH
-eval "`fnm env --use-on-cd --version-file-strategy=recursive --resolve-engines`"
 
 
 # rye is a project and package management solution for Python
@@ -199,7 +201,6 @@ if [ -f $HOME/.css.sh ] ; then
     source "$HOME/.css.sh"
 fi
 
-# potry/rye alternative for python uv
 . "$HOME/.cargo/env"
 
 # pnpm
@@ -209,3 +210,19 @@ case ":$PATH:" in
   *) export PATH="$PNPM_HOME:$PATH" ;;
 esac
 # pnpm end
+
+CLAUDE_BASH_MAINTAIN_PROJECT_WORKING_DIR=1
+
+
+# dbt aliases
+alias dbtf=/home/pcaro/.local/bin/dbt
+
+# Added by dbt installer
+export PATH="$PATH:/home/pcaro/bin"
+
+# dbt aliases
+alias dbtf=/home/pcaro/bin/dbt
+
+if [ -x $HOME/.local/bin/zoxide ] ; then
+   eval "$(zoxide init bash)"
+fi

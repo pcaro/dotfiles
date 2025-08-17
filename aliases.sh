@@ -7,19 +7,21 @@ __add_command_replace_alias() {
     fi
 }
 
-__add_command_replace_alias git 'hub'
 __add_command_replace_alias man 'tldr'
 __add_command_replace_alias df 'pydf'
+__add_command_replace_alias bat 'batcat'
 
 # Stopwatch
 alias timer='echo "Timer started. Stop with Ctrl-D." && date && time cat && date'
 alias myip="dig +short myip.opendns.com @resolver1.opendns.com"
 
+alias claude-danger='claude --dangerously-skip-permissions'
 
 # cd aliases
 alias cd.='cd ..'
 alias cd-='cd -'
 alias cd..='cd ..'
+alias z=zoxide
 
 # some more ls aliases
 alias ll='ls -l -h'
@@ -33,12 +35,14 @@ alias s='cursor'
 alias sgo='code  -g'
 alias busca='fd'
 alias fd='fdfind'
-alias bat='batcat'
 alias batp='batcat -p'
 alias agsql='ag --sql'
 alias agpy='ag --python'
 alias agmd='ag --markdown'
 alias agi='ag -i'
+
+alias kcopy='xclip -selection clipboard'
+alias clipboard='xclip -selection clipboard'
 
 # Enables forwarding of the authentication agent connection.
 alias sshpro='eval `ssh-agent`;ssh-add'
@@ -46,7 +50,6 @@ alias ssh='ssh -A'
 
 alias grinp='grin -I "*.py"'
 alias grinh='grin -I "*.html"'
-alias grinmodels='grin -I "models.py"'
 alias grinurls='grin -I "urls.py"'
 alias grina='grin -I "admin.py"'
 alias grinpo='grin -I "*.po"'
@@ -56,6 +59,10 @@ alias hs='hg status'
 alias hsum='hg summary'
 alias hcm='hg commit -m'
 
+
+# dbt
+alias dbt-show-dependencies='dbt list --resource-type model --resource-type source --select '
+alias dbt-fix-schemas='dbt-osmosis yaml refactor '
 
 # docker
 alias dk='docker'
@@ -119,5 +126,5 @@ execute_latest_appimage() {
 }
 
 # Define an alias for the 'cursor' program
-alias cursor='execute_latest_appimage cursor'
+alias cursor='execute_latest_appimage ursor'
 
