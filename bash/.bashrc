@@ -130,10 +130,6 @@ if [ "$PS1" ]; then
         export PATH=~/.diff-so-fancy:$PATH
     fi
 
-    # mercurial prompt by hg-prompt
-    # if [ -f $HOME/.prompt.sh ] ; then
-    #     source $HOME/.prompt.sh
-    # fi
     # https://github.com/magicmonty/bash-git-prompt/
     GIT_PROMPT_THEME=Default_NoExitState_Ubuntu
     source ~/.bash-git-prompt/gitprompt.sh
