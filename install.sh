@@ -22,6 +22,7 @@ PACKAGES=(
     "screen"
     "hg"
     "jed"
+    "nano"
     "buildout-config"
 )
 

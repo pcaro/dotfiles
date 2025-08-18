@@ -44,22 +44,31 @@ stow python  # Solo configuración de python
 
 ```
 .dotfiles/
-├── bash/           # Configuración de Bash
+├── bash/            # Configuración de Bash
 │   ├── .bashrc
 │   ├── .bash_profile
-│   └── .aliases
-├── git/            # Configuración de Git
-│   └── .gitconfig
-├── python/         # Configuración de Python
+│   ├── .aliases
+│   ├── .aliases_local
+│   ├── .fzf.bash
+│   └── .up_function.sh
+├── git/             # Configuración de Git
+│   ├── .gitconfig
+│   ├── .gitignore_global
+│   └── .git-flow-completion.bash
+├── python/          # Configuración de Python
 │   └── .pythonrc.py
-├── screen/         # Configuración de Screen
+├── screen/          # Configuración de Screen
 │   └── .screenrc
-├── hg/             # Configuración de Mercurial
+├── hg/              # Configuración de Mercurial
 │   ├── .hgrc
 │   └── .hgignore
-├── jed/            # Configuración del editor JED
+├── jed/             # Configuración del editor JED
 │   └── .jedrc
+├── nano/            # Configuración del editor Nano
+│   └── .nanorc
 └── buildout-config/ # Configuración de Buildout
+    ├── .buildout
+    └── .zopeskel
 ```
 
 ## Comandos útiles

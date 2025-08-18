@@ -39,8 +39,8 @@ alias mv='mv -i'
 alias mkdir='mkdir -pv'
 
 # Editor shortcuts
-alias s='${VISUAL:-cursor}'
-alias sgo='${VISUAL:-cursor} -g'
+alias s='execute_latest_appimage cursor'
+alias sgo='execute_latest_appimage cursor -g'
 alias claude-danger='claude --dangerously-skip-permissions'
 
 # Search tools
@@ -116,7 +116,10 @@ execute_latest_appimage() {
     local directory="${HOME}/bin"
     local latest_appimage
     
+    # Use case-insensitive pattern matching
+    shopt -s nocaseglob
     latest_appimage=$(ls -t "${directory}"/*"${program}"*.AppImage 2>/dev/null | head -n 1)
+    shopt -u nocaseglob
     
     if [ -n "$latest_appimage" ] && [ -f "$latest_appimage" ]; then
         echo "Executing: $(basename "$latest_appimage")"

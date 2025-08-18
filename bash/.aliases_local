@@ -1,0 +1,119 @@
+
+alias psql-posterscope-tunel-dev='psql cartodb_user_0d6b04fc-7533-4ff4-b327-8cdf1f0e8cde_db -U cartodb_user_c06e44bf-c0b0-4306-8a40-8f9957bdc6e7 -v ON_ERROR_STOP=1 -h localhost -p 5554 '
+alias psql-posterscope-tunel-admin='psql cartodb_user_0d6b04fc-7533-4ff4-b327-8cdf1f0e8cde_db -U cartodb_user_0d6b04fc-7533-4ff4-b327-8cdf1f0e8cde -h localhost -p 5554  -v ON_ERROR_STOP=1'
+alias psql-posterscope-tunel-dev='psql cartodb_user_0d6b04fc-7533-4ff4-b327-8cdf1f0e8cde_db -U cartodb_user_c06e44bf-c0b0-4306-8a40-8f9957bdc6e7 -h localhost -p 5554  -v ON_ERROR_STOP=1'
+alias psql-posterscope-tunel-team='psql cartodb_user_0d6b04fc-7533-4ff4-b327-8cdf1f0e8cde_db -U cartodb_user_c822717f-d505-4693-8df5-fb5410c9150d -h localhost -p 5554  -v ON_ERROR_STOP=1'
+alias psql-posterscope-tunel-staging='psql cartodb_user_0d6b04fc-7533-4ff4-b327-8cdf1f0e8cde_db -U cartodb_user_77240451-3e3e-4bd1-a05e-a63bd3eadb18 -h localhost -p 5554  -v ON_ERROR_STOP=1'
+
+alias psql-posterscope-admin='PGPASSWORD=d07bbcf8cab49bfb0b63d586415195eea05902f1 psql "\
+     sslmode=verify-full \
+     sslrootcert=/home/pcaro/src/geo/certificado_pcaro_cloud/server_ca.pem \
+     sslcert=/home/pcaro/src/geo/certificado_pcaro_cloud/client.crt \
+     sslkey=/home/pcaro/src/geo/certificado_pcaro_cloud/client.key \
+     host=dbconn-geuw.carto.com \
+     port=5432 \
+     user=posterscope-admin"'
+
+alias gcloud-italy='gcloud config set account xy-italy-prod@carto-ps-bq-xy-italy.iam.gserviceaccount.com && gcloud config set project clz200258-datateam-italy'
+alias gcloud-carto='gcloud config set account pcaro@cartodb.com && gcloud config set project geographica-gs'
+
+# alias psql-carto-cci-admin='PGPASSWORD=af717c837c60919f84e7dfa0d7a4c6c60f73f8d8 psql "\
+#      sslmode=verify-full \
+#      sslrootcert=/home/ajaest/.bin/_carto_certs/cci-admin/server_ca.pem \
+#      sslcert=/home/ajaest/.bin/_carto_certs/cci-admin/client.crt \
+#      sslkey=/home/ajaest/.bin/_carto_certs/cci-admin/client.key \
+#      host=dbconn-geuw.carto.com \
+#      port=5432 \
+#      user=cci-admin"'
+# alias psql-carto-cci-dev='PGPASSWORD=1ffb5cde5d52393971e3b88186da71179f30e89d psql "\
+#      sslmode=require \
+#      sslcert=/home/ajaest/.bin/_carto_certs/cci-dev/client.crt \
+#      sslkey=/home/ajaest/.bin/_carto_certs/cci-dev/client.key \
+#      host=dbconn-geuw.carto.com \
+#      port=5432 \
+#      user=cci-admin-dev"'
+
+# alias psql-carto-cci-production='PGPASSWORD=e8593cc7cadec0470de71e9f3cc9f0871adc78bc psql "\
+#      sslmode=verify-full \
+#      sslrootcert=/home/ajaest/.bin/_carto_certs/cci-production/server_ca.pem \
+#      sslcert=/home/ajaest/.bin/_carto_certs/cci-production/client.crt \
+#      sslkey=/home/ajaest/.bin/_carto_certs/cci-production/client.key \
+#      host=dbconn-geuw.carto.com \
+#      port=5432 \
+#      user=cci-production"'
+
+# alias psql-carto-cci-dev-2='PGPASSWORD=b370e5fd0f2b95afcf4c7713b2afe2826cfc9500 psql "\
+#      sslmode=verify-full \
+#      sslrootcert=/home/ajaest/.bin/_carto_certs/cci-dev-2/server_ca.pem \
+#      sslcert=/home/ajaest/.bin/_carto_certs/cci-dev-2/client.crt \
+#      sslkey=/home/ajaest/.bin/_carto_certs/cci-dev-2/client.key \
+#      host=dbconn-geuw.carto.com \
+#      port=5432 \
+#      user=cci-admin-dev-2"'
+
+# alias psql-carto-cci-staging='PGPASSWORD=e95c9a53e62ec84f332a8d6f0496d69249c72e1c psql "\
+#      sslmode=require \
+#      sslcert=/home/ajaest/.bin/_carto_certs/cci-staging/client.crt \
+#      sslkey=/home/ajaest/.bin/_carto_certs/cci-staging/client.key \
+#      host=dbconn-geuw.carto.com \
+#      port=5432 \
+#      user=cci-staging"'
+
+# alias psql-carto-sagulpa-admin='PGPASSWORD=f51f07d7551c3d7766c0c34ba4604bc13acb02ba psql "\
+#      sslmode=verify-full \
+#      sslrootcert=/home/ajaest/.bin/_carto_certs/sagulpa-admin/server_ca.pem \
+#      sslcert=/home/ajaest/.bin/_carto_certs/sagulpa-admin/client.crt \
+#      sslkey=/home/ajaest/.bin/_carto_certs/sagulpa-admin/client.key \
+#      host=dbconn-geuw.carto.com \
+#      port=5432 \
+#      user=sagulpa-admin"'
+
+alias psql-redshift-initiative-dev='PGCLIENTENCODING=UTF8 PGPASSWORD=awsC4rt0 psql -h redshift-cluster-1.c2gsqdockj5a.us-east-2.redshift.amazonaws.com -U awsuser initiative -p 5439'
+# alias psql-carto-initiative='PGPASSWORD=awsC4rt0 psql -h redshift-cluster-1.c2gsqdockj5a.us-east-2.redshift.amazonaws.com -U awsuser -p 5439 initiative'
+# alias psql-carto-initiative-new='PGPASSWORD=L9_rlj%AiWyHBrUbW5UobwHu-6\[q=8tlFmr\)2\*v2n\]s0nMtFeQoyk\(E\]q%h7Xq8N psql -h carto-redshift-shared-4736.csskrjtdvvro.us-east-1.redshift.amazonaws.com -U redshift_dev_admin_9572 -p 5439 initiative'
+
+
+alias psql-carto-geoximitynew-prod='PGPASSWORD=69a4e6b0f768d8ac421f40585a60f9245406dbb0cartodb_user_604211e3-1d25-4848-88dd-0468b32ab04f psql -U 'cartodb_user_604211e3-1d25-4848-88dd-0468b32ab04f' cartodb_user_0d6b04fc-7533-4ff4-b327-8cdf1f0e8cde_db -h posterscope-carto.geographica.gs'
+alias psql-carto-geoximitynew-dev='PGPASSWORD=d1084ae0e80907844e4714b738022ca927a4b2dbcartodb_user_d95b3056-996e-4026-a8b6-bb242e5a8342 psql -U cartodb_user_d95b3056-996e-4026-a8b6-bb242e5a8342 cartodb_user_0d6b04fc-7533-4ff4-b327-8cdf1f0e8cde_db -h posterscope-carto.geographica.gs'
+alias psql-carto-geoximitynew-staging='PGPASSWORD=a24f8f8e0cf00c68cb45458d80e28106327942a2cartodb_user_050c4106-620e-41b0-9c94-231c6e2ca3a6 psql -U cartodb_user_050c4106-620e-41b0-9c94-231c6e2ca3a6 cartodb_user_0d6b04fc-7533-4ff4-b327-8cdf1f0e8cde_db -h posterscope-carto.geographica.gs'
+
+
+alias psql-carto-vdf-prod-es="ssh -q -t vodafone-prod-web psql -U cartodb_user_a2aef380-f66d-41b3-b07b-eb7b4650fd65 cartodb_user_a2aef380-f66d-41b3-b07b-eb7b4650fd65_db -v ON_ERROR_STOP=1 -h 192.168.0.3"
+alias psql-carto-vdf-dev="ssh -q -t vodafone-dev 'psql -U cartodb_user_cd0193e0-0946-4ee4-aa45-7aeddb64068c cartodb_user_cd0193e0-0946-4ee4-aa45-7aeddb64068c_db -v ON_ERROR_STOP=1'"
+alias psql-carto-vdf-staging="ssh -q -t vodafone-dev 'psql -U cartodb_user_b92b0a47-1c1c-42c9-9022-ba6cd6a31495 cartodb_user_b92b0a47-1c1c-42c9-9022-ba6cd6a31495_db -v ON_ERROR_STOP=1'"
+
+
+# alias psql-carto-vdf-prod-jda="ssh -q -t vodafone-prod-jda psql -U postgres -h 192.168.98.3 -U cartodb_user_45770278-3ac4-4eba-814f-04ed2535f30b cartodb_user_45770278-3ac4-4eba-814f-04ed2535f30b_db -v ON_ERROR_STOP=1"
+# alias psql-carto-vdf-prod-group='ssh -q -t vodafone-prod-group '\''ssh -t db -q psql  -U cartodb_user_d009879e-8718-45a3-82de-b17396deeb0b -d cartodb_user_d009879e-8718-45a3-82de-b17396deeb0b_db -v ON_ERROR_STOP=1'\'''
+
+alias psql-carto-vdf-politis-prod='PGPASSWORD=26a731b7aab680d599b124c37daeb6d5766f10ae psql -v ON_ERROR_STOP=1 "\
+     sslmode=require \
+     host=dbconn-geuw.carto.com \
+     port=5432 \
+     user=politis-admin"'
+alias psql-carto-vdf-politis-dev='PGPASSWORD=6c23ae5f8b2b9fc6a8f27ebe73ec86fc3477410b psql -v ON_ERROR_STOP=1 "\
+     sslmode=require \
+     host=dbconn-geuw.carto.com \
+     port=5432 \
+     user=politis-dev"'
+
+alias kube_secret_data="jq --sort-keys '[.data|to_entries[]|.value=(.value|@base64d)]|from_entries'"
+
+alias psql-consorci='PGPASSWORD=22477f6bfb424741fbe5c58d2270608b39849128 psql "\
+     sslmode=verify-full
+     sslrootcert=/home/pcaro/src/amb-consorci/.certs/server_ca.pem \
+     sslcert=/home/pcaro/src/amb-consorci/.certs/client.crt \
+     sslkey=/home/pcaro/src/amb-consorci/.certs/client.key \
+     host=dbconn-geuw.carto.com \
+     port=5432 \
+     user=amb-consorci-dev-admin"'
+
+
+alias psql-consorci-prod='PGPASSWORD=4ab4114a4b5e70d2f9caf9c7e2b7539a31e85c11 psql "\
+     sslmode=verify-full
+     sslrootcert=/home/pcaro/src/amb-consorci/.certs/prod/server_ca.pem \
+     sslcert=/home/pcaro/src/amb-consorci/.certs/prod/client.crt \
+     sslkey=/home/pcaro/src/amb-consorci/.certs/prod/client.key \
+     host=dbconn-geuw.carto.com \
+     port=5432 \
+     user=consorci-admin"'
