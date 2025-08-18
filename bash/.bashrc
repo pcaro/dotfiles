@@ -112,8 +112,7 @@ source_if_exists "$HOME/.dotenv/git-flow-completion.bash"
 command -v direnv &>/dev/null && eval "$(direnv hook bash)"
 command -v zoxide &>/dev/null && eval "$(zoxide init bash)"
 
-# FZF
-source_if_exists "$HOME/.fzf.bash"
+command -v fzf &>/dev/null && eval "$(fzf --bash)"
 
 # CSS utilities
 source_if_exists "$HOME/.css.sh"

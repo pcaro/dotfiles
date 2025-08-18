@@ -90,15 +90,6 @@ stow -n -v <paquete>
 stow -D <paquete> && stow <paquete>
 ```
 
-## Migración desde estructura antigua
-
-Si tienes los dotfiles en la estructura antigua, ejecuta:
-
-```bash
-chmod +x migrate_to_stow.sh
-./migrate_to_stow.sh
-```
-
 ## Añadir nuevos dotfiles
 
 1. Crea un nuevo directorio para el paquete
