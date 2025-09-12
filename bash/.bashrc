@@ -96,8 +96,15 @@ fi
 # Python - uv
 command -v uv &>/dev/null && eval "$(uv generate-shell-completion bash)"
 
+# command -v container-use &>/dev/null && eval "$(container-use completion bash)"
+command -v container-use &>/dev/null && eval "$(container-use completion --command-name=cu bash)"
+
+command -v dagger &>/dev/null && eval "$(dagger completion bash)"
+
 # Rust
 source_if_exists "$HOME/.cargo/env"
+
+source_if_exists "$HOME/.gw.sh"
 
 # Git prompt
 if [ -f "$HOME/.bash-git-prompt/gitprompt.sh" ]; then

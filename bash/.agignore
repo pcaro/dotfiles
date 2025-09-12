@@ -1,0 +1,12 @@
+.*
+~*
+*.ipynb
+*.html
+
+*.asv
+*.autosave
+slprj/
+hdlsrc/
+*grt_rtw/
+
+node_modules/
