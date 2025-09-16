@@ -9,4 +9,5 @@ slprj/
 hdlsrc/
 *grt_rtw/
 
-node_modules/
+node_modules
+dist

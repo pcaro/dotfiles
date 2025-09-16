@@ -11,7 +11,6 @@ __add_command_replace_alias() {
 # Command replacements (if available)
 __add_command_replace_alias man 'tldr'
 __add_command_replace_alias df 'pydf'
-__add_command_replace_alias bat 'batcat'
 
 # System information
 alias timer='echo "Timer started. Stop with Ctrl-D." && date && time cat && date'
@@ -48,7 +47,7 @@ if command -v fdfind &>/dev/null; then
     alias fd='fdfind'
 fi
 alias busca='fd'
-alias batp='batcat -p'
+alias batp='bat -p'
 alias agsql='ag --sql'
 alias agpy='ag --python'
 alias agmd='ag --markdown'
@@ -115,12 +114,12 @@ execute_latest_appimage() {
     local program="$1"
     local directory="${HOME}/bin"
     local latest_appimage
-    
+
     # Use case-insensitive pattern matching
     shopt -s nocaseglob
     latest_appimage=$(ls -t "${directory}"/*"${program}"*.AppImage 2>/dev/null | head -n 1)
     shopt -u nocaseglob
-    
+
     if [ -n "$latest_appimage" ] && [ -f "$latest_appimage" ]; then
         echo "Executing: $(basename "$latest_appimage")"
         chmod +x "$latest_appimage"
