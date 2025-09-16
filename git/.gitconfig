@@ -6,14 +6,17 @@
     editor = nano
     filemode = true
     whitespace = trailing-space, tab-in-indent, tabwidth=4
-	pager = diff-so-fancy | less --tabs=4 -RFX
+	# https://github.com/dandavison/delta/releases
+	pager = delta
+	; pager = diff-so-fancy | less --tabs=4 -RFX
 	excludesfile = ~/.gitignore_global
 
+[delta]
+    navigate = true  # use n and N to move between diff sections
+    side-by-side = true
 
 [color]
     ui = auto
-
-[color]
     decorate = short
 
 [push]
@@ -25,8 +28,8 @@
 [credential]
     helper = store
 
-[diff]
-    algorithm = patience
+[interactive]
+    diffFilter = delta --color-only
 
 [status]
     showStash = true
@@ -39,7 +42,7 @@
     co = checkout
     sw = switch
     logs = log --name-status
-    
+
     # Radarview aliases
     rv = "!flow"
     up = "!flow up"
@@ -108,12 +111,14 @@
     meld =  mergetool -t meld
     kdiff =  mergetool -t kdiff3
 
-[merge]
-	tool = meld
+# [merge]
+#	tool = meld
 
 [tag]
 	sort = v:refname
+
 [init]
 	defaultBranch = main
+
 [mergetool]
 	keepBackup = false
