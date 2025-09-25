@@ -62,7 +62,13 @@ _gw_validate_name() {
 gw() {
     local cmd="$1"
     if [ -z "$cmd" ]; then
-        _gw_usage
+        local repo_root
+        repo_root="$(_gw_get_repo_root)"
+        if [ -n "$repo_root" ]; then
+            _gw_list
+        else
+            _gw_usage
+        fi
         return 0
     fi
     shift
