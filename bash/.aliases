@@ -21,15 +21,17 @@ alias myip="dig +short myip.opendns.com @resolver1.opendns.com"
 alias cd.='cd ..'
 alias cd..='cd ..'
 alias cd-='cd -'
-alias ..='cd ..'
-alias ...='cd ../..'
-alias ....='cd ../../..'
+
 
 # ls variants
 alias ll='ls -lh'
 alias la='ls -A'
 alias l='ls -CF'
 alias lt='ls -ltr'  # Sort by time, newest last
+
+# git
+alias gitst='git st'
+alias gits='git st'
 
 # Safety nets
 alias rm='rm -i'
@@ -41,6 +43,9 @@ alias mkdir='mkdir -pv'
 alias s='execute_latest_appimage cursor'
 alias sgo='execute_latest_appimage cursor -g'
 alias claude-danger='claude --dangerously-skip-permissions'
+alias claude-carto='/home/pcaro/src/terraform-gcp-carto-ai-staff-usage/scripts/carto_claude.sh'
+alias claude-carto-danger='/home/pcaro/src/terraform-gcp-carto-ai-staff-usage/scripts/carto_claude.sh --dangerously-skip-permissions'
+
 
 # Search tools
 if command -v fdfind &>/dev/null; then
