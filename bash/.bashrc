@@ -78,7 +78,6 @@ export EDITOR="${EDITOR:-nano}"
 
 # Python configuration
 export PIP_RESPECT_VIRTUALENV=true
-export PYTHONSTARTUP="$HOME/.pythonrc.py"
 
 # Development tools
 # Ruby - rbenv

@@ -18,7 +18,6 @@ fi
 PACKAGES=(
     "bash"
     "git"
-    "python"
     "screen"
     "hg"
     "jed"

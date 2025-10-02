@@ -37,7 +37,6 @@ chmod +x install.sh
 cd ~/.dotfiles
 stow bash    # Solo configuración de bash
 stow git     # Solo configuración de git
-stow python  # Solo configuración de python
 ```
 
 ## Estructura
@@ -55,8 +54,6 @@ stow python  # Solo configuración de python
 │   ├── .gitconfig
 │   ├── .gitignore_global
 │   └── .git-flow-completion.bash
-├── python/          # Configuración de Python
-│   └── .pythonrc.py
 ├── screen/          # Configuración de Screen
 │   └── .screenrc
 ├── hg/              # Configuración de Mercurial
