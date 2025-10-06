@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # gw - Git Worktree Helper
-# A git worktree manager using the sibling directory strategy
+# A git worktree manager using the subdirectory strategy
 #
 # Installation:
 #   Source this file in your .zshrc or .bashrc:
@@ -13,8 +13,8 @@
 #   gw list              - List all worktrees
 #   gw clean             - Remove all worktrees (with confirmation)
 
-# Allow overriding the suffix for worktree directories (default: -worktrees).
-: "${GW_WORKTREE_SUFFIX:=-worktrees}"
+# Allow overriding the suffix for worktree directories (default: /.worktrees).
+: "${GW_WORKTREE_SUFFIX:=/.worktrees}"
 
 # Input validation function to prevent path traversal and command injection
 _gw_validate_name() {
@@ -121,13 +121,7 @@ _gw_get_main_repo_root() {
     git worktree list 2>/dev/null | head -n 1 | awk '{print $1}'
 }
 
-# Get the repository name
-_gw_get_repo_name() {
-    local repo_root="$1"
-    basename "$repo_root"
-}
-
-# Get the base path for worktrees (sibling strategy)
+# Get the base path for worktrees (subdirectory strategy)
 _gw_get_worktree_base() {
     local main_repo_root
     main_repo_root="$(_gw_get_main_repo_root)"
@@ -137,9 +131,7 @@ _gw_get_worktree_base() {
         [ -z "$main_repo_root" ] && return 1
     fi
 
-    local repo_name
-    repo_name="$(_gw_get_repo_name "$main_repo_root")"
-    echo "$(dirname "$main_repo_root")/${repo_name}${GW_WORKTREE_SUFFIX}"
+    echo "${main_repo_root}${GW_WORKTREE_SUFFIX}"
 }
 
 # Resolve branch information for create/review commands.
