@@ -90,23 +90,25 @@ _gw_usage() {
 gw - Git Worktree Helper
 
 Commands:
-  create <name> [--stay]         Create a worktree and cd to it (uses existing branch if found; --stay to not cd)
-  review <name> [--stay]         Create a worktree from existing local/remote branch and cd to it (--stay to not cd)
-  rm <name> [--keep-branch]       Remove a worktree (with confirmation; --keep-branch keeps the branch)
-  cd [name]                      Navigate to a worktree or repo root (if no name)
-  list                           List all worktrees for current repo
-  clean                          Remove all worktrees (with confirmation)
+  create <name> [directory] [--stay]  Create a worktree and cd to it (uses existing branch if found; --stay to not cd)
+  review <name> [--stay]              Create a worktree from existing local/remote branch and cd to it (--stay to not cd)
+  rm <name> [--keep-branch]           Remove a worktree (with confirmation; --keep-branch keeps the branch)
+  cd [name]                           Navigate to a worktree or repo root (if no name)
+  list                                List all worktrees for current repo
+  clean                               Remove all worktrees (with confirmation)
 
 Examples:
-  gw create feature-x       # Create and switch to worktree 'feature-x' (new branch from current)
-  gw create feature-x --stay  # Create worktree without switching
-  gw create existing-branch # Create worktree using existing local/remote branch
-  gw review feature/pr-123  # Create worktree from existing branch (for review)
+  gw create feature-x              # Create and switch to worktree 'feature-x' (new branch from current)
+  gw create feature-x custom-dir   # Create branch 'feature-x' in directory 'custom-dir'
+  gw create feature-x --stay       # Create worktree without switching
+  gw create feature-x custom --stay # Create with custom directory, don't switch
+  gw create existing-branch        # Create worktree using existing local/remote branch
+  gw review feature/pr-123         # Create worktree from existing branch (for review)
   gw review feature/pr-123 --stay  # Create review worktree without switching
-  gw cd feature-x           # Navigate to worktree
-  gw cd                     # Navigate to repository root
-  gw rm feature-x           # Remove worktree (and branch by default)
-  gw rm feature-x --keep-branch  # Remove worktree but keep branch
+  gw cd feature-x                  # Navigate to worktree
+  gw cd                            # Navigate to repository root
+  gw rm feature-x                  # Remove worktree (and branch by default)
+  gw rm feature-x --keep-branch    # Remove worktree but keep branch
 EOF
 }
 
@@ -170,19 +172,33 @@ _gw_resolve_branch() {
 # Create a new worktree
 _gw_create() {
     local name="$1"
+    local dir_name=""
     local stay=false
     shift
-    if [ $# -gt 0 ] && [ "$1" = "--stay" ]; then
-        stay=true
-        shift
+
+    # Check if next arg is --stay or directory name
+    if [ $# -gt 0 ]; then
+        if [ "$1" = "--stay" ]; then
+            stay=true
+            shift
+        else
+            dir_name="$1"
+            shift
+            # Check if --stay is next
+            if [ $# -gt 0 ] && [ "$1" = "--stay" ]; then
+                stay=true
+                shift
+            fi
+        fi
     fi
+
     if [ $# -gt 0 ]; then
         echo "Error: Unknown arguments" >&2
         return 1
     fi
-    [ -z "$name" ] && { echo "Usage: gw create <name> [--stay]"; return 1; }
+    [ -z "$name" ] && { echo "Usage: gw create <name> [directory] [--stay]"; return 1; }
 
-    # Validate the worktree name
+    # Validate the branch name
     if ! _gw_validate_name "$name"; then
         return 1
     fi
@@ -193,8 +209,17 @@ _gw_create() {
 
     local worktree_base
     worktree_base="$(_gw_get_worktree_base)"
-    # Replace slashes with double underscores for directory name
-    local dir_name="${name//\//__}"
+
+    # If no directory name provided, derive from branch name
+    if [ -z "$dir_name" ]; then
+        dir_name="${name//\//__}"
+    fi
+
+    # Validate the directory name
+    if ! _gw_validate_name "$dir_name"; then
+        return 1
+    fi
+
     local worktree_path="$worktree_base/$dir_name"
 
     # Check if worktree already exists (use fixed string matching)
@@ -737,6 +762,24 @@ if [ -n "${BASH_VERSION:-}" ]; then
                 COMPREPLY=($(compgen -W "$branches" -- "$cur"))
             fi
         elif [ "$cmd" = "create" ] && [ "$COMP_CWORD" -eq 3 ]; then
+            # Complete with directory names from worktree_base or --stay
+            local worktree_base options="--stay"
+            worktree_base="$(_gw_get_worktree_base 2>/dev/null)"
+            if [ -n "$worktree_base" ] && [ -d "$worktree_base" ]; then
+                # Add existing directory names as completion options
+                while IFS= read -r dir_name; do
+                    if [ -n "$dir_name" ]; then
+                        options="$options $dir_name"
+                    fi
+                done < <(ls "$worktree_base" 2>/dev/null)
+            fi
+            if command -v mapfile >/dev/null 2>&1; then
+                mapfile -t COMPREPLY < <(compgen -W "$options" -- "$cur")
+            else
+                # shellcheck disable=SC2207
+                COMPREPLY=($(compgen -W "$options" -- "$cur"))
+            fi
+        elif [ "$cmd" = "create" ] && [ "$COMP_CWORD" -eq 4 ]; then
             if command -v mapfile >/dev/null 2>&1; then
                 mapfile -t COMPREPLY < <(compgen -W "--stay" -- "$cur")
             else
@@ -862,59 +905,21 @@ elif [ -n "${ZSH_VERSION:-}" ]; then
                         done < <(git branch -r --format='%(refname:short)' 2>/dev/null | grep '^origin/')
                         _describe 'branch' branch_names
                     elif [ "$CURRENT" -eq 4 ]; then
-                        local -a flags=(--stay:stay in current directory)
-                        _describe 'flag' flags
-                    fi
-                    ;;
-                create)
-                    if [ "$CURRENT" -eq 3 ]; then
-                        # Complete with existing branch names, excluding dependabot branches
-                        local -a branch_names
-                        branch_names=()
-                        # Get local branches
-                        while IFS= read -r branch; do
-                            if [ -n "$branch" ] && [[ ! "$branch" =~ ^dependabot/ ]]; then
-                                branch_names+=("$branch:local branch")
-                            fi
-                        done < <(git branch --format='%(refname:short)' 2>/dev/null)
-                        # Get remote branches (without origin/ prefix)
-                        while IFS= read -r branch; do
-                            if [ -n "$branch" ]; then
-                                local clean_branch="${branch#origin/}"
-                                if [[ ! "$clean_branch" =~ ^dependabot/ ]]; then
-                                    branch_names+=("$clean_branch:remote branch")
+                        # Complete with directory names from worktree_base or --stay
+                        local worktree_base
+                        worktree_base="$(_gw_get_worktree_base 2>/dev/null)"
+                        local -a dir_options=('--stay:stay in current directory')
+                        if [ -n "$worktree_base" ] && [ -d "$worktree_base" ]; then
+                            # Add existing directory names
+                            while IFS= read -r dir_name; do
+                                if [ -n "$dir_name" ]; then
+                                    dir_options+=("$dir_name:existing worktree directory")
                                 fi
-                            fi
-                        done < <(git branch -r --format='%(refname:short)' 2>/dev/null | grep '^origin/')
-                        _describe 'branch' branch_names
-                    elif [ "$CURRENT" -eq 4 ]; then
-                        local -a flags=(--stay:stay in current directory)
-                        _describe 'flag' flags
-                    fi
-                    ;;
-                review)
-                    if [ "$CURRENT" -eq 3 ]; then
-                        # Complete with existing branch names, excluding dependabot branches
-                        local -a branch_names
-                        branch_names=()
-                        # Get local branches
-                        while IFS= read -r branch; do
-                            if [ -n "$branch" ] && [[ ! "$branch" =~ ^dependabot/ ]]; then
-                                branch_names+=("$branch:local branch")
-                            fi
-                        done < <(git branch --format='%(refname:short)' 2>/dev/null)
-                        # Get remote branches (without origin/ prefix)
-                        while IFS= read -r branch; do
-                            if [ -n "$branch" ]; then
-                                local clean_branch="${branch#origin/}"
-                                if [[ ! "$clean_branch" =~ ^dependabot/ ]]; then
-                                    branch_names+=("$clean_branch:remote branch")
-                                fi
-                            fi
-                        done < <(git branch -r --format='%(refname:short)' 2>/dev/null | grep '^origin/')
-                        _describe 'branch' branch_names
-                    elif [ "$CURRENT" -eq 4 ]; then
-                        local -a flags=(--stay:stay in current directory)
+                            done < <(ls "$worktree_base" 2>/dev/null)
+                        fi
+                        _describe 'directory or flag' dir_options
+                    elif [ "$CURRENT" -eq 5 ]; then
+                        local -a flags=('--stay:stay in current directory')
                         _describe 'flag' flags
                     fi
                     ;;

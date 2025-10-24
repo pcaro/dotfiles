@@ -145,3 +145,5 @@ export USE_GKE_GCLOUD_AUTH_PLUGIN=True
 
 # Claude Code working directory
 export CLAUDE_BASH_MAINTAIN_PROJECT_WORKING_DIR=1
+
+source /home/pcaro/.config/broot/launcher/bash/br

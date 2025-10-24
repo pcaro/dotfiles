@@ -24,3 +24,5 @@ fi
 #    export MANPATH
 #fi
 
+
+source /home/pcaro/.config/broot/launcher/bash/br

@@ -24,14 +24,16 @@ alias cd-='cd -'
 
 
 # ls variants
-alias ll='ls -lh'
-alias la='ls -A'
-alias l='ls -CF'
-alias lt='ls -ltr'  # Sort by time, newest last
+alias ls='eza'
+alias ll='eza -lh'
+alias la='eza -a'
+alias l='eza'
+alias lt='eza -r -s modified'  # Sort by time, newest last
 
 # git
 alias gitst='git st'
 alias gits='git st'
+alias gitst.='git st .'
 
 # Safety nets
 alias rm='rm -i'
@@ -43,8 +45,7 @@ alias mkdir='mkdir -pv'
 alias s='execute_latest_appimage cursor'
 alias sgo='execute_latest_appimage cursor -g'
 alias claude-danger='claude --dangerously-skip-permissions'
-alias claude-carto='/home/pcaro/src/terraform-gcp-carto-ai-staff-usage/scripts/carto_claude.sh'
-alias claude-carto-danger='/home/pcaro/src/terraform-gcp-carto-ai-staff-usage/scripts/carto_claude.sh --dangerously-skip-permissions'
+alias claude-carto-danger='claude-carto --dangerously-skip-permissions'
 
 
 # Search tools
