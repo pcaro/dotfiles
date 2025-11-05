@@ -386,6 +386,45 @@ _gw_review() {
     fi
 }
 
+# Check for uncommitted changes in a worktree
+_gw_check_uncommitted_changes() {
+    local worktree_path="$1"
+    local name="$2"
+
+    # Check if directory exists
+    if [ ! -d "$worktree_path" ]; then
+        return 0
+    fi
+
+    # Check for uncommitted changes in the worktree
+    local has_changes=false
+    local status_output=""
+
+    # Run git status in the worktree directory
+    pushd "$worktree_path" > /dev/null 2>&1 || return 1
+
+    # Check for any uncommitted changes
+    if [ -n "$(git status --porcelain 2>/dev/null)" ]; then
+        has_changes=true
+        status_output="$(git status --short 2>/dev/null)"
+    fi
+
+    popd > /dev/null 2>&1
+
+    if [ "$has_changes" = true ]; then
+        echo "⚠️  WARNING: Uncommitted changes detected in worktree '$name'"
+        echo
+        echo "Changes found:"
+        echo "$status_output" | while IFS= read -r line; do
+            echo "  $line"
+        done
+        echo
+        return 1
+    fi
+
+    return 0
+}
+
 # Handle branch deletion logic when removing worktrees
 _gw_handle_branch_deletion() {
     local name="$1"
@@ -466,6 +505,10 @@ _gw_remove() {
         return 1
     fi
 
+    # Check for uncommitted changes before showing removal info
+    _gw_check_uncommitted_changes "$worktree_path" "$name"
+    local has_uncommitted=$?
+
     # Show what will be removed
     echo "This will remove the following worktree:"
     echo "  Path: $worktree_path"
@@ -474,12 +517,24 @@ _gw_remove() {
         echo "  (Branch will be kept)"
     fi
     echo
-    printf "Are you sure you want to remove this worktree? [y/N] "
-    read -r REPLY
 
-    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-        echo "Cancelled"
-        return 1
+    # Different confirmation message if there are uncommitted changes
+    if [ $has_uncommitted -eq 1 ]; then
+        echo "⚠️  This worktree has uncommitted changes that will be LOST."
+        echo
+        printf "Type 'YES' to confirm you want to remove this worktree with changes: "
+        read -r REPLY
+        if [ "$REPLY" != "YES" ]; then
+            echo "Cancelled"
+            return 1
+        fi
+    else
+        printf "Are you sure you want to remove this worktree? [y/N] "
+        read -r REPLY
+        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+            echo "Cancelled"
+            return 1
+        fi
     fi
 
     # Check if we are in the worktree being removed and switch to main if so
@@ -578,6 +633,10 @@ _gw_list() {
     echo
     echo "Worktrees:"
 
+    # Get list of merged branches
+    local merged_branches
+    merged_branches="$(git branch --merged 2>/dev/null | sed 's/^[*+ ] *//')"
+
     local current_path
     current_path="$(pwd)"
     local found=false
@@ -589,20 +648,50 @@ _gw_list() {
         wt_name="${wt_path##*/}"
         local display_name="${wt_name//__/\/}"
 
+        # Check if branch is merged
+        local is_merged=false
+        if echo "$merged_branches" | grep -Fxq "$wt_branch"; then
+            is_merged=true
+        fi
+
+        # Check if we're in this worktree by comparing real paths
+        # This ensures we only match if we're actually inside this worktree
+        local is_current=false
+        if [[ -d "$wt_path" ]]; then
+            local current_real current_parent wt_real
+            current_real="$(readlink -f "$current_path")"
+            current_parent="$(readlink -f "$current_real/..")"
+            wt_real="$(readlink -f "$wt_path")"
+            # Check if we're at the worktree itself, or in a subdirectory of it
+            # by checking if the current directory's parent equals the worktree,
+            # or if current equals worktree
+            if [[ "$current_parent" == "$wt_real" || "$current_real" == "$wt_real" ]]; then
+                is_current=true
+            fi
+        fi
+
         if [ "$wt_path" = "$repo_root" ]; then
             found=true
-            local marker="  - main"
-            if [[ "$current_path" == "$repo_root" || "$current_path" == "$repo_root"/* ]]; then
-                marker="  * [current] main"
+            local marker="  -"
+            if [ "$is_current" = true ]; then
+                marker="  *"
             fi
-            echo "$marker: $wt_path ($wt_branch)"
+            local merge_indicator=""
+            if [ "$is_merged" = true ]; then
+                merge_indicator=" [✓]"
+            fi
+            echo "$marker main$merge_indicator: $wt_path ($wt_branch)"
         elif [[ "$wt_path" == "$worktree_base"/* ]]; then
             found=true
-            local prefix="  -"
-            if { [[ "$current_path" == "$wt_path" ]] || [[ "$current_path" == "$wt_path"/* ]]; }; then
-                prefix="  * [current]"
+            local marker="  -"
+            if [ "$is_current" = true ]; then
+                marker="  *"
             fi
-            echo "$prefix $display_name: $wt_path ($wt_branch)"
+            local merge_indicator=""
+            if [ "$is_merged" = true ]; then
+                merge_indicator=" [✓]"
+            fi
+            echo "$marker $display_name$merge_indicator: $wt_path ($wt_branch)"
         fi
     done < <(git worktree list)
 
@@ -625,6 +714,7 @@ _gw_clean() {
     echo "Worktrees to be removed:"
 
     local count=0
+    local has_uncommitted=false
     while IFS= read -r line; do
         local path
         path=$(echo "$line" | awk '{print $1}')
@@ -638,6 +728,15 @@ _gw_clean() {
             branch=$(echo "$line" | sed -n 's/.*\[\(.*\)\].*/\1/p')
             echo "  - $path ($branch)"
             count=$((count + 1))
+
+            # Check for uncommitted changes in this worktree
+            if [ -d "$path" ]; then
+                pushd "$path" > /dev/null 2>&1
+                if [ -n "$(git status --porcelain 2>/dev/null)" ]; then
+                    has_uncommitted=true
+                fi
+                popd > /dev/null 2>&1
+            fi
         fi
     done < <(git worktree list)
 
@@ -647,6 +746,10 @@ _gw_clean() {
     fi
 
     echo
+    if [ "$has_uncommitted" = true ]; then
+        echo "⚠️  WARNING: Some worktrees have uncommitted changes that will be LOST."
+        echo
+    fi
     echo "This action cannot be undone!"
     printf "Type 'yes' to confirm: "
     read -r REPLY

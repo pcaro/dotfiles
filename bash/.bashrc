@@ -35,12 +35,15 @@ add_to_path() {
 }
 
 # Build PATH
+add_to_path "/sbin"
+add_to_path "/usr/sbin"
+add_to_path "/usr/local/go/bin"
 add_to_path "$HOME/bin"
+add_to_path "$HOME/go/bin"
 add_to_path "$HOME/.local/bin"
 add_to_path "$HOME/.cargo/bin"
 add_to_path "$HOME/.diff-so-fancy"
-add_to_path "/usr/sbin"
-add_to_path "/sbin"
+add_to_path "$HOME/.opencode/bin"
 
 # Terminal title function
 function nameTerminal() {
