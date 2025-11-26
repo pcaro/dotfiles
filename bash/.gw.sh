@@ -112,6 +112,16 @@ Examples:
 EOF
 }
 
+# Replace $HOME with ~ in a path for display
+_gw_display_path() {
+    local path="$1"
+    if [[ "$path" == "$HOME"/* ]]; then
+        echo "~${path#$HOME}"
+    else
+        echo "$path"
+    fi
+}
+
 # Get the git repository root
 _gw_get_repo_root() {
     git rev-parse --show-toplevel 2>/dev/null
@@ -629,13 +639,48 @@ _gw_list() {
 
     local worktree_base
     worktree_base="$(_gw_get_worktree_base)"
-    echo "Worktree base: $worktree_base"
+    echo "Worktree base: $(_gw_display_path "$worktree_base")"
     echo
     echo "Worktrees:"
 
-    # Get list of merged branches
+    # Fetch latest from remote (silently)
+    git fetch --quiet 2>/dev/null || true
+
+    # Get the branch name from the main repository (the one outside .worktrees)
+    local main_branch
+    pushd "$repo_root" > /dev/null 2>&1
+    main_branch="$(git branch --show-current 2>/dev/null)"
+    popd > /dev/null 2>&1
+
+    # Use the remote version of that branch for comparison
+    local main_remote_branch=""
+    if [ -n "$main_branch" ] && git show-ref --verify --quiet "refs/remotes/origin/$main_branch"; then
+        main_remote_branch="origin/$main_branch"
+    else
+        # Fallback: try common main branch names
+        if git show-ref --verify --quiet refs/remotes/origin/master; then
+            main_remote_branch="origin/master"
+        elif git show-ref --verify --quiet refs/remotes/origin/main; then
+            main_remote_branch="origin/main"
+        elif git show-ref --verify --quiet refs/remotes/origin/dev; then
+            main_remote_branch="origin/dev"
+        else
+            # Last resort: use origin/HEAD
+            local default_branch
+            default_branch="$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null | sed 's@^refs/remotes/origin/@@')"
+            if [ -n "$default_branch" ] && git show-ref --verify --quiet "refs/remotes/origin/$default_branch"; then
+                main_remote_branch="origin/$default_branch"
+            fi
+        fi
+    fi
+
+    # Get list of branches merged into the main remote branch
     local merged_branches
-    merged_branches="$(git branch --merged 2>/dev/null | sed 's/^[*+ ] *//')"
+    if [ -n "$main_remote_branch" ]; then
+        merged_branches="$(git branch --merged "$main_remote_branch" 2>/dev/null | sed 's/^[*+ ] *//')"
+    else
+        merged_branches=""
+    fi
 
     local current_path
     current_path="$(pwd)"
@@ -680,7 +725,7 @@ _gw_list() {
             if [ "$is_merged" = true ]; then
                 merge_indicator=" [✓]"
             fi
-            echo "$marker main$merge_indicator: $wt_path ($wt_branch)"
+            echo "$marker root$merge_indicator: $(_gw_display_path "$wt_path") ($wt_branch)"
         elif [[ "$wt_path" == "$worktree_base"/* ]]; then
             found=true
             local marker="  -"
@@ -691,7 +736,7 @@ _gw_list() {
             if [ "$is_merged" = true ]; then
                 merge_indicator=" [✓]"
             fi
-            echo "$marker $display_name$merge_indicator: $wt_path ($wt_branch)"
+            echo "$marker $display_name$merge_indicator: $(_gw_display_path "$wt_path") ($wt_branch)"
         fi
     done < <(git worktree list)
 
