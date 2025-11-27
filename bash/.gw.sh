@@ -699,6 +699,39 @@ _gw_list() {
             is_merged=true
         fi
 
+        # Check for uncommitted changes (always check, not just when merged)
+        local has_changes=false
+        if [ -d "$wt_path" ]; then
+            pushd "$wt_path" > /dev/null 2>&1
+            if [ -n "$(git status --porcelain 2>/dev/null)" ]; then
+                has_changes=true
+            fi
+            popd > /dev/null 2>&1
+        fi
+
+        # Only show tick if: merged + no uncommitted changes + synced with origin
+        local show_tick=false
+        if [ "$is_merged" = true ] && [ "$has_changes" = false ] && [ -d "$wt_path" ]; then
+            # Check if local branch is synced with origin (no unpushed commits)
+            pushd "$wt_path" > /dev/null 2>&1
+            local is_synced=true
+            if git show-ref --verify --quiet "refs/remotes/origin/$wt_branch"; then
+                # Compare local and remote
+                local local_commit remote_commit
+                local_commit="$(git rev-parse "$wt_branch" 2>/dev/null)"
+                remote_commit="$(git rev-parse "origin/$wt_branch" 2>/dev/null)"
+                if [ "$local_commit" != "$remote_commit" ]; then
+                    is_synced=false
+                fi
+            fi
+            popd > /dev/null 2>&1
+
+            # Show tick only if merged, no changes, and synced
+            if [ "$is_synced" = true ]; then
+                show_tick=true
+            fi
+        fi
+
         # Check if we're in this worktree by comparing real paths
         # This ensures we only match if we're actually inside this worktree
         local is_current=false
@@ -721,22 +754,26 @@ _gw_list() {
             if [ "$is_current" = true ]; then
                 marker="  *"
             fi
-            local merge_indicator=""
-            if [ "$is_merged" = true ]; then
-                merge_indicator=" [✓]"
+            local status_indicator=""
+            if [ "$show_tick" = true ]; then
+                status_indicator=" [✓]"
+            elif [ "$has_changes" = true ]; then
+                status_indicator=" [*]"
             fi
-            echo "$marker root$merge_indicator: $(_gw_display_path "$wt_path") ($wt_branch)"
+            echo "$marker root$status_indicator: $(_gw_display_path "$wt_path") ($wt_branch)"
         elif [[ "$wt_path" == "$worktree_base"/* ]]; then
             found=true
             local marker="  -"
             if [ "$is_current" = true ]; then
                 marker="  *"
             fi
-            local merge_indicator=""
-            if [ "$is_merged" = true ]; then
-                merge_indicator=" [✓]"
+            local status_indicator=""
+            if [ "$show_tick" = true ]; then
+                status_indicator=" [✓]"
+            elif [ "$has_changes" = true ]; then
+                status_indicator=" [*]"
             fi
-            echo "$marker $display_name$merge_indicator: $(_gw_display_path "$wt_path") ($wt_branch)"
+            echo "$marker $display_name$status_indicator: $(_gw_display_path "$wt_path") ($wt_branch)"
         fi
     done < <(git worktree list)
 
