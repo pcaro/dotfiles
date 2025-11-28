@@ -15,6 +15,190 @@
 
 # Allow overriding the suffix for worktree directories (default: /.worktrees).
 : "${GW_WORKTREE_SUFFIX:=/.worktrees}"
+: "${GW_TAB_COUNT:=3}"
+
+# Yakuake tab management
+_gw_yakuake_is_running() {
+    qdbus org.kde.yakuake >/dev/null 2>&1
+}
+
+_gw_get_project_name() {
+    local worktree_name="$1"
+    # ss-alcampo-es -> alcampo
+    if [[ "$worktree_name" =~ ^ss-([a-zA-Z0-9]+)-[a-zA-Z0-9]+$ ]]; then
+        echo "${BASH_REMATCH[1]}"
+    else
+        echo "$worktree_name"
+    fi
+}
+
+_gw_find_project_tabs() {
+    local project_name_prefix="$1"
+    local session_ids
+    session_ids=$(qdbus org.kde.yakuake /yakuake/sessions sessionIds)
+    for session_id in $session_ids; do
+        local title
+        title=$(qdbus org.kde.yakuake /yakuake/tabs tabTitle "$session_id")
+        if [[ "$title" =~ ^$project_name_prefix[[:space:]][0-9]+$ ]]; then
+            echo "$title"
+        fi
+    done
+}
+
+_gw_get_next_tab_number() {
+    local project_name="$1"
+    local tabs
+    tabs=$(_gw_find_project_tabs "$project_name")
+    if [ -z "$tabs" ]; then
+        echo 1
+        return
+    fi
+
+    local max_num=0
+    while IFS= read -r tab_title; do
+        local num
+        num=${tab_title##* }
+        if [[ "$num" -gt "$max_num" ]]; then
+            max_num=$num
+        fi
+    done <<< "$tabs"
+    echo $((max_num + 1))
+}
+
+_gw_create_tabs() {
+    local worktree_name="$1"
+    local worktree_path="$2"
+
+    if ! _gw_yakuake_is_running; then
+        echo "Warning: Yakuake is not running. Tabs not created."
+        return
+    fi
+
+    local project_name
+    project_name=$(_gw_get_project_name "$worktree_name")
+
+    # Collision check
+    local existing_tabs
+    existing_tabs=$(_gw_find_project_tabs "$project_name")
+    if [ -n "$existing_tabs" ]; then
+        echo "Warning: Tabs with prefix '$project_name' already exist. Using full worktree name."
+        project_name="$worktree_name"
+    fi
+
+    local tab_count="${GW_TAB_COUNT}"
+    echo "Creating $tab_count Yakuake tabs for project '$project_name'..."
+
+    for i in $(seq 1 "$tab_count"); do
+        local session_id
+        session_id=$(qdbus org.kde.yakuake /yakuake/sessions addSession)
+        qdbus org.kde.yakuake /yakuake/tabs setTabTitle "$session_id" "$project_name $i"
+        qdbus org.kde.yakuake /yakuake/sessions runCommand "cd '$worktree_path'"
+
+        local status_msg="✓ Tab $i: $project_name $i"
+        if [ "$i" -eq 1 ]; then
+            if command -v carto_claude >/dev/null 2>&1; then
+                local terminal_id
+                terminal_id=$(qdbus org.kde.yakuake /yakuake/sessions terminalIdForSessionId "$session_id")
+                qdbus org.kde.yakuake /yakuake/sessions runCommandInTerminal "$terminal_id" "carto_claude"
+                status_msg+=" (running carto_claude)"
+            else
+                status_msg+=" (Warning: carto_claude not found)"
+            fi
+        fi
+        echo "  $status_msg"
+    done
+}
+
+_gw_detect_current_project() {
+    # Directory-based detection
+    local repo_root
+    repo_root=$(_gw_get_repo_root)
+    if [ -n "$repo_root" ]; then
+        local current_dir
+        current_dir=$(pwd)
+        local worktree_base
+        worktree_base="$(_gw_get_worktree_base)"
+        if [[ "$current_dir" == "$worktree_base"* ]]; then
+            local worktree_dir_name
+            worktree_dir_name=${current_dir#$worktree_base/}
+            worktree_dir_name=${worktree_dir_name%%/*} # handle subdirs
+            local worktree_name="${worktree_dir_name//__/\/}"
+            _gw_get_project_name "$worktree_name"
+            return
+        fi
+    fi
+
+    # Fallback: Tab title-based detection
+    if _gw_yakuake_is_running; then
+        local active_session
+        active_session=$(qdbus org.kde.yakuake /yakuake/sessions activeSessionId)
+        if [ -n "$active_session" ]; then
+            local title
+            title=$(qdbus org.kde.yakuake /yakuake/tabs tabTitle "$active_session")
+            if [[ "$title" =~ ^([^[:space:]]+)[[:space:]][0-9]+$ ]]; then
+                echo "${BASH_REMATCH[1]}"
+                return
+            fi
+        fi
+    fi
+
+    echo ""
+}
+
+_gw_add_tab() {
+    if ! _gw_yakuake_is_running; then
+        echo "Error: Yakuake is not running." >&2
+        return 1
+    fi
+
+    local project_name
+    project_name=$(_gw_detect_current_project)
+
+    if [ -z "$project_name" ]; then
+        # If project not detected, use current tab's title as the project name
+        local active_session
+        active_session=$(qdbus org.kde.yakuake /yakuake/sessions activeSessionId)
+        if [ -n "$active_session" ]; then
+            local current_title
+            current_title=$(qdbus org.kde.yakuake /yakuake/tabs tabTitle "$active_session")
+
+            # If the title has a number at the end, use the part before it as the project name
+            if [[ "$current_title" =~ ^(.*[^[:space:]])[[:space:]]+[0-9]+$ ]]; then
+                project_name="${BASH_REMATCH[1]}"
+            else
+                project_name="$current_title"
+            fi
+        fi
+    fi
+
+    if [ -z "$project_name" ]; then
+        echo "Error: Could not detect project or get current tab title. Run 'gw tab' from within a worktree or a project tab." >&2
+        return 1
+    fi
+
+    echo "Detected project: $project_name"
+    local existing_tabs
+    existing_tabs=$(qdbus org.kde.yakuake /yakuake/sessions sessionIds | while read -r id; do qdbus org.kde.yakuake /yakuake/tabs tabTitle "$id"; done | grep "^$project_name [0-9]\+$" | tr '\n' ',' | sed 's/,$//')
+    echo "Found existing tabs: ${existing_tabs//,/ }"
+
+
+    local next_num
+    next_num=$(_gw_get_next_tab_number "$project_name")
+    local tab_title="$project_name $next_num"
+    echo "Creating tab: $tab_title"
+
+    local worktree_path
+    worktree_path=$(pwd) # Assume we are in the correct worktree path
+
+    local session_id
+    session_id=$(qdbus org.kde.yakuake /yakuake/sessions addSession)
+    qdbus org.kde.yakuake /yakuake/tabs setTabTitle "$session_id" "$tab_title"
+    qdbus org.kde.yakuake /yakuake/sessions runCommand "cd '$worktree_path'"
+
+    echo "  ✓ Tab created successfully"
+    echo "Note: New tab created at end of tab bar. Reorder manually if needed."
+}
+
 
 # Input validation function to prevent path traversal and command injection
 _gw_validate_name() {
@@ -80,6 +264,7 @@ gw() {
         cd)      _gw_cd "$@" ;;
         list|ls) _gw_list "$@" ;;
         clean)   _gw_clean "$@" ;;
+        tab|tabs)  _gw_add_tab "$@" ;;
         help|-h|--help) _gw_usage ;;
         *)       echo "Unknown command: $cmd"; _gw_usage; return 1 ;;
     esac
@@ -90,15 +275,17 @@ _gw_usage() {
 gw - Git Worktree Helper
 
 Commands:
-  create <name> [directory] [--stay]  Create a worktree and cd to it (uses existing branch if found; --stay to not cd)
+  create <name> [directory] [--stay] [--tabs] Create a worktree and cd to it (uses existing branch if found; --stay to not cd, --tabs to create yakuake tabs)
   review <name> [--stay]              Create a worktree from existing local/remote branch and cd to it (--stay to not cd)
   rm <name> [--keep-branch]           Remove a worktree (with confirmation; --keep-branch keeps the branch)
   cd [name]                           Navigate to a worktree or repo root (if no name)
   list                                List all worktrees for current repo
   clean                               Remove all worktrees (with confirmation)
+  tab                                 Add a yakuake tab to the current project
 
 Examples:
   gw create feature-x              # Create and switch to worktree 'feature-x' (new branch from current)
+  gw create feature-x --tabs       # Create worktree and yakuake tabs
   gw create feature-x custom-dir   # Create branch 'feature-x' in directory 'custom-dir'
   gw create feature-x --stay       # Create worktree without switching
   gw create feature-x custom --stay # Create with custom directory, don't switch
@@ -109,6 +296,7 @@ Examples:
   gw cd                            # Navigate to repository root
   gw rm feature-x                  # Remove worktree (and branch by default)
   gw rm feature-x --keep-branch    # Remove worktree but keep branch
+  gw tab                           # Add a yakuake tab
 EOF
 }
 
@@ -184,29 +372,34 @@ _gw_create() {
     local name="$1"
     local dir_name=""
     local stay=false
+    local tabs=false
     shift
 
-    # Check if next arg is --stay or directory name
-    if [ $# -gt 0 ]; then
-        if [ "$1" = "--stay" ]; then
-            stay=true
-            shift
-        else
-            dir_name="$1"
-            shift
-            # Check if --stay is next
-            if [ $# -gt 0 ] && [ "$1" = "--stay" ]; then
+    # Parse arguments
+    while [ $# -gt 0 ]; do
+        case "$1" in
+            --stay)
                 stay=true
                 shift
-            fi
-        fi
-    fi
+                ;;
+            --tabs)
+                tabs=true
+                shift
+                ;;
+            *)
+                if [ -z "$dir_name" ]; then
+                    dir_name="$1"
+                    shift
+                else
+                    echo "Error: Unknown argument '$1'" >&2
+                    _gw_usage
+                    return 1
+                fi
+                ;;
+        esac
+    done
 
-    if [ $# -gt 0 ]; then
-        echo "Error: Unknown arguments" >&2
-        return 1
-    fi
-    [ -z "$name" ] && { echo "Usage: gw create <name> [directory] [--stay]"; return 1; }
+    [ -z "$name" ] && { echo "Usage: gw create <name> [directory] [--stay] [--tabs]"; return 1; }
 
     # Validate the branch name
     if ! _gw_validate_name "$name"; then
@@ -306,6 +499,10 @@ _gw_create() {
     else
         echo "Successfully created worktree '$name'"
         echo "To navigate to it, run: gw cd $name"
+    fi
+
+    if [ "$tabs" = true ]; then
+        _gw_create_tabs "$name" "$worktree_path"
     fi
 }
 
@@ -891,10 +1088,10 @@ if [ -n "${BASH_VERSION:-}" ]; then
         if [ "$COMP_CWORD" -eq 1 ]; then
             # Use readarray if available, otherwise fall back to direct assignment
             if command -v mapfile >/dev/null 2>&1; then
-                mapfile -t COMPREPLY < <(compgen -W "create review rm remove cd list ls clean help" -- "$cur")
+                mapfile -t COMPREPLY < <(compgen -W "create review rm remove cd list ls clean tab help" -- "$cur")
             else
                 # shellcheck disable=SC2207
-                COMPREPLY=($(compgen -W "create review rm remove cd list ls clean help" -- "$cur"))
+                COMPREPLY=($(compgen -W "create review rm remove cd list ls clean tab help" -- "$cur"))
             fi
         elif [ "$cmd" = "review" ] && [ "$COMP_CWORD" -eq 2 ]; then
             # Complete with existing branch names (local and remote), excluding dependabot branches
@@ -946,30 +1143,30 @@ if [ -n "${BASH_VERSION:-}" ]; then
                 # shellcheck disable=SC2207
                 COMPREPLY=($(compgen -W "$branches" -- "$cur"))
             fi
-        elif [ "$cmd" = "create" ] && [ "$COMP_CWORD" -eq 3 ]; then
-            # Complete with directory names from worktree_base or --stay
-            local worktree_base options="--stay"
-            worktree_base="$(_gw_get_worktree_base 2>/dev/null)"
-            if [ -n "$worktree_base" ] && [ -d "$worktree_base" ]; then
-                # Add existing directory names as completion options
-                while IFS= read -r dir_name; do
-                    if [ -n "$dir_name" ]; then
-                        options="$options $dir_name"
-                    fi
-                done < <(ls "$worktree_base" 2>/dev/null)
+        elif [ "$cmd" = "create" ] && [ "$COMP_CWORD" -ge 3 ]; then
+            # Completion for arguments after `gw create <name>`
+            local last_word="${COMP_WORDS[COMP_CWORD-1]}"
+            local options="--stay --tabs"
+
+            # If the last word was not a flag, we might be looking for a directory
+            if [[ ! "$last_word" =~ ^-- ]]; then
+                local worktree_base
+                worktree_base="$(_gw_get_worktree_base 2>/dev/null)"
+                if [ -n "$worktree_base" ] && [ -d "$worktree_base" ]; then
+                    # Add existing directory names as completion options
+                    while IFS= read -r dir_name; do
+                        if [ -n "$dir_name" ]; then
+                            options="$options $dir_name"
+                        fi
+                    done < <(ls "$worktree_base" 2>/dev/null)
+                fi
             fi
+
             if command -v mapfile >/dev/null 2>&1; then
                 mapfile -t COMPREPLY < <(compgen -W "$options" -- "$cur")
             else
                 # shellcheck disable=SC2207
                 COMPREPLY=($(compgen -W "$options" -- "$cur"))
-            fi
-        elif [ "$cmd" = "create" ] && [ "$COMP_CWORD" -eq 4 ]; then
-            if command -v mapfile >/dev/null 2>&1; then
-                mapfile -t COMPREPLY < <(compgen -W "--stay" -- "$cur")
-            else
-                # shellcheck disable=SC2207
-                COMPREPLY=($(compgen -W "--stay" -- "$cur"))
             fi
         elif [ "$cmd" = "cd" ] && [ "$COMP_CWORD" -eq 2 ]; then
             # Complete with worktree names (safely handle special characters)
@@ -1040,6 +1237,7 @@ elif [ -n "${ZSH_VERSION:-}" ]; then
                 'list:List all worktrees'
                 'ls:List all worktrees'
                 'clean:Remove all worktrees'
+                'tab:Add a yakuake tab'
                 'help:Show help'
             )
 
@@ -1089,11 +1287,11 @@ elif [ -n "${ZSH_VERSION:-}" ]; then
                             fi
                         done < <(git branch -r --format='%(refname:short)' 2>/dev/null | grep '^origin/')
                         _describe 'branch' branch_names
-                    elif [ "$CURRENT" -eq 4 ]; then
-                        # Complete with directory names from worktree_base or --stay
+                    elif [ "$CURRENT" -ge 4 ]; then
+                        # Complete with directory names from worktree_base or flags
                         local worktree_base
                         worktree_base="$(_gw_get_worktree_base 2>/dev/null)"
-                        local -a dir_options=('--stay:stay in current directory')
+                        local -a dir_options=('--stay:stay in current directory' '--tabs:create yakuake tabs')
                         if [ -n "$worktree_base" ] && [ -d "$worktree_base" ]; then
                             # Add existing directory names
                             while IFS= read -r dir_name; do
@@ -1103,9 +1301,6 @@ elif [ -n "${ZSH_VERSION:-}" ]; then
                             done < <(ls "$worktree_base" 2>/dev/null)
                         fi
                         _describe 'directory or flag' dir_options
-                    elif [ "$CURRENT" -eq 5 ]; then
-                        local -a flags=('--stay:stay in current directory')
-                        _describe 'flag' flags
                     fi
                     ;;
                 rm|remove|cd)
