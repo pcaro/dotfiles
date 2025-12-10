@@ -25,10 +25,26 @@ PACKAGES=(
     "buildout-config"
 )
 
+# Packages to be stowed in ~/.config
+CONFIG_PACKAGES=(
+    "activitywatch"
+    "tmux"
+)
+
 for package in "${PACKAGES[@]}"; do
     if [ -d "$package" ]; then
-        echo "📦 Instalando $package..."
+        echo "📦 Instalando $package en $HOME..."
         stow -v -t "$HOME" "$package"
+    else
+        echo "⚠️  Paquete $package no encontrado, saltando..."
+    fi
+done
+
+for package in "${CONFIG_PACKAGES[@]}"; do
+    if [ -d "$package" ]; then
+        echo "📦 Instalando $package en ~/.config/$package..."
+        mkdir -p "$HOME/.config/$package"
+        stow -v -t "$HOME/.config/$package" "$package"
     else
         echo "⚠️  Paquete $package no encontrado, saltando..."
     fi
@@ -42,4 +58,5 @@ echo "  stow <paquete>      # Instalar un paquete específico"
 echo "  stow -D <paquete>   # Desinstalar un paquete"
 echo "  stow -R <paquete>   # Reinstalar un paquete"
 echo ""
-echo "Paquetes disponibles: ${PACKAGES[*]}"
+ALL_PACKAGES=("${PACKAGES[@]}" "${CONFIG_PACKAGES[@]}")
+echo "Paquetes disponibles: ${ALL_PACKAGES[*]}"
