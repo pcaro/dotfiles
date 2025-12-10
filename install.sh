@@ -30,6 +30,7 @@ CONFIG_PACKAGES=(
     "activitywatch"
     "tmux"
     "kitty"
+    "zed"
 )
 
 for package in "${PACKAGES[@]}"; do

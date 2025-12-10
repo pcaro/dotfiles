@@ -1,0 +1,178 @@
+// Zed settings
+//
+// For information on how to configure Zed, see the Zed
+// documentation: https://zed.dev/docs/configuring-zed
+//
+// To see all of Zed's default settings without changing your
+// custom settings, run `zed: open default settings` from the
+// command palette (cmd-shift-p / ctrl-shift-p)
+{
+  "context_servers": {
+    "mcp-server-context7": {
+      "enabled": true,
+      "settings": {
+        "context7_api_key": "ctx7sk-e08d09be-be82-4be0-82b9-efcb9a6c3210"
+      }
+    }
+  },
+  "project_panel": {
+    // Decrease the horizontal indent size of files & folders in the project
+    // panel to avoid horizontal scrolling
+    "indent_size": 16
+  },
+  "git_panel": {
+    "dock": "right"
+  },
+  "auto_install_extensions": {
+    "dart": true,
+    "git-firefly": true,
+    "ruff": true,
+    "xcode-themes": true,
+    "toml": true,
+    "LOG": true,
+    "Python": true,
+    "NGINX": true
+  },
+  // Inlay hints preconfigured by Zed: Go, Rust, Typescript and Svelte
+  "inlay_hints": {
+    "enabled": true
+  },
+  "agent": {
+    "inline_assistant_model": {
+      "provider": "openrouter",
+      "model": "deepseek/deepseek-chat-v3.1:free"
+    },
+    "use_modifier_to_send": true,
+    "default_profile": "write",
+    "default_model": {
+      "provider": "openrouter",
+      "model": "x-ai/grok-4-fast:free"
+    },
+    "model_parameters": [],
+    "play_sound_when_agent_done": true
+  },
+  "icon_theme": "Catppuccin Mocha",
+  "base_keymap": "VSCode",
+  "telemetry": {
+    "diagnostics": false,
+    "metrics": false
+  },
+  "ui_font_size": 16,
+  "buffer_font_size": 16,
+  "theme": {
+    "mode": "system",
+    // "light": "One Light",
+    // "dark": "GitHub Dark Default",
+    "light": "Gruvbox Light Soft",
+    "dark": "Xcode High Contrast Darker"
+  },
+  // Remove the < > buttons from the tab bar
+  "tab_bar": {
+    "show": true,
+    "show_nav_history_buttons": false
+  },
+  // Show file type icons in the tab bar. Also color them according to the
+  // git status.
+  "tabs": {
+    "file_icons": true,
+    "git_status": true
+  },
+
+  // Set a preferred line lenth, showing a vertical gutter bar
+  "preferred_line_length": 140,
+  "show_whitespaces": "trailing",
+  "show_wrap_guides": true,
+  "remove_trailing_whitespace_on_save": true,
+  "ensure_final_newline_on_save": true,
+  "file_types": {
+    "Dockerfile": ["Dockerfile", "Dockerfile.*"],
+    "JSON": ["json", "jsonc", "*.code-snippets"],
+    // git_firefly extension
+    "Git Attributes": ["{git,.git,.git/info}/attributes"],
+    "Git Config": ["{git,.git/modules,.git/modules/*}/config"],
+    "Git Ignore": ["{git,.git}/ignore", ".git/info/exclude"]
+  },
+  "languages": {
+    "Markdown": {
+      // Wrap text according to the previously defined preferred line length.
+      "soft_wrap": "preferred_line_length",
+      "preferred_line_length": 100,
+
+      // do not remove any trailing whitespace since line breaks in
+      // lists (without adding a new punctuation) rely on whitespaces.
+      "remove_trailing_whitespace_on_save": false
+    },
+    "Python": {
+      "language_servers": ["ty", "basedpyright"],
+      "format_on_save": "off"
+    }
+  },
+  "terminal": {
+    "detect_venv": {
+      "on": {
+        "directories": [".env", "env", ".venv", "venv"],
+        "activate_script": "default"
+      }
+    }
+  },
+  "agent_servers": {
+    "claude-carto": {
+      "command": "/home/pcaro/src/terraform-gcp-carto-ai-staff-usage/scripts/carto_claude.sh",
+      "args": [],
+      "env": {}
+    },
+    "claude": {
+      // "command": "/home/pcaro/bin/claude_carto.sh"
+    }
+  },
+  "file_scan_exclusions": [
+    "**/.git",
+    "**/.svn",
+    "**/.hg",
+    "**/CVS",
+    "**/.DS_Store",
+    "**/Thumbs.db",
+    "**/.classpath",
+    "**/.settings",
+    // above is default from Zed
+    "**/out",
+    "**/dist",
+    "**/.husky",
+    "**/.turbo",
+    "**/.vscode-test",
+    "**/.vscode",
+    "**/.next",
+    "**/.storybook",
+    "**/.tap",
+    "**/.nyc_output",
+    "**/report",
+    "**/node_modules"
+  ],
+  "lsp": {
+    "oxc": {
+      "initialization_options": {
+        "options": {
+          "run": "onType",
+          "configPath": null,
+          "tsConfigPath": null,
+          "unusedDisableDirectives": "allow",
+          "typeAware": false,
+          "flags": {}
+        }
+      }
+    },
+    "markdownlint": {
+      "binary": {
+        // https://github.com/DavidAnson/markdownlint
+        "arguments": ["--disable", "MD013"]
+      }
+    }
+  },
+  "git": {
+    "inline_blame": {
+      "enabled": true,
+      // default 0 is too much
+      "delay_ms": 600
+    }
+  }
+}
