@@ -14,7 +14,6 @@ __add_command_replace_alias df 'pydf'
 
 # System information
 alias timer='echo "Timer started. Stop with Ctrl-D." && date && time cat && date'
-alias myip="dig +short myip.opendns.com @resolver1.opendns.com"
 
 
 # Navigation
@@ -53,7 +52,47 @@ if command -v fdfind &>/dev/null; then
     alias fd='fdfind'
 fi
 alias busca='fd'
+alias fzfp="fzf --preview='bat --color=always --line-range :500 {}'"
+alias hist='cat ~/.bash_history | fzf'
+alias h='cat ~/.bash_history | fzf '
+fzf_find_edit() {
+    local file=$(
+      fzf --query="$1" --no-multi --select-1 --exit-0 \
+          --preview 'bat --color=always --line-range :500 {}'
+    )
+    if [[ -n "$file" ]]; then
+        $EDITOR "$file"
+    fi
+}
+alias fe='fzf_find_edit'
+fzf_change_directory() {
+    local directory=$(
+      fd --type d | \
+        fzf --query="$1" --no-multi --select-1 --exit-0 \
+            --preview 'tree -C {} | head -100'
+    )
+    if [[ -n $directory ]]; then
+        cd "$directory"
+    fi
+}
+alias fcd='fzf_change_directory'
+fzf_git_add() {
+    local selections=$(
+      git ls-files -m -o --exclude-standard | \
+        fzf --ansi \
+            --preview 'if (git ls-files --error-unmatch {1} &>/dev/null); then
+                           git diff --color=always {1}
+                       else
+                           bat --color=always --line-range :500 {1}
+                       fi'
+    )
+    if [[ -n $selections ]]; then
+        git add --verbose $selections
+    fi
+}
+alias gadd='fzf_git_add'
 alias batp='bat -p'
+alias batf="fzf --bind 'enter:become(bat {})'"
 alias agsql='ag --sql'
 alias agpy='ag --python'
 alias agmd='ag --markdown'
@@ -62,6 +101,7 @@ alias agi='ag -i'
 # Clipboard
 alias clip='xclip -selection clipboard'
 alias paste='xclip -selection clipboard -o'
+alias cwd='echo -n ${PWD/#$HOME/\~} | tr -d "\r\n" | xclip -selection clipboard -i'
 
 # SSH
 alias sshpro='eval $(ssh-agent); ssh-add'

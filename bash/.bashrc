@@ -8,9 +8,10 @@ case $- in
 esac
 
 # History configuration
-HISTCONTROL=ignoreboth:erasedups
-HISTSIZE=10000
-HISTFILESIZE=20000
+HISTCONTROL=ignoreboth:erasedups # Ignore and erase duplicates
+HISTIGNORE=?:??                  # Ignore one and two letter commands
+HISTFILESIZE=99999               # Max size of history file
+HISTSIZE=99999                   # Amount of history to preserve
 shopt -s histappend
 
 # Window size check
@@ -52,12 +53,6 @@ function nameTerminal() {
     [ "$TERM" = "konsole" ] && local ansiNrTab=30 ansiNrWindow=0
     [ $ansiNrTab ] && echo -n $'\e'"]$ansiNrTab;$1"$'\a'
     [ $ansiNrWindow -a "$2" ] && echo -n $'\e'"]$ansiNrWindow;$2"$'\a'
-}
-
-# Clipboard helper
-function to_clip() {
-    local message="${1:-"Por favor, proporciona el mensaje adicional"}"
-    { cat; echo "$message"; } | xclip -sel clip
 }
 
 # Source files if they exist
@@ -121,6 +116,7 @@ source_if_exists "$HOME/.dotenv/git-flow-completion.bash"
 command -v direnv &>/dev/null && eval "$(direnv hook bash)"
 command -v zoxide &>/dev/null && eval "$(zoxide init bash)"
 
+export FZF_DEFAULT_OPTS='--height 75% --multi --reverse --border'
 command -v fzf &>/dev/null && eval "$(fzf --bash)"
 
 # CSS utilities

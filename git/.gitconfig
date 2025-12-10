@@ -43,10 +43,6 @@
     sw = switch
     logs = log --name-status
 
-    # Radarview aliases
-    rv = "!flow"
-    up = "!flow up"
-
     branches = branch -vv
     getbranch = "!x() { git co origin/$1 -b $1; }; x"
     fixbranch = "!x() { b=`git symbolic-ref -q --short HEAD` && git rebase --onto $b master $1 && git diff --stat $b && git checkout $b; }; x"
@@ -110,6 +106,7 @@
 
     meld =  mergetool -t meld
     kdiff =  mergetool -t kdiff3
+    ll = log --graph --format=\"%C(yellow)%h%C(red)%d%C(reset) - %C(bold green)(%ar)%C(reset) %s %C(blue)<%an>%C(reset)\"
 
 # [merge]
 #	tool = meld
