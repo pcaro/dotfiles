@@ -104,7 +104,30 @@ alias paste='xclip -selection clipboard -o'
 alias cwd='echo -n ${PWD/#$HOME/\~} | tr -d "\r\n" | xclip -selection clipboard -i'
 
 # SSH
-alias sshpro='eval $(ssh-agent); ssh-add'
+function sshpro() {
+    # 1. Comprueba si el agente está corriendo y si el socket existe
+    if [ -z "$SSH_AUTH_SOCK" ] || ! kill -0 "$SSH_AGENT_PID" 2> /dev/null; then
+        echo "Iniciando un nuevo agente SSH..."
+        # Inicia el agente y evalúa su salida para configurar variables
+        eval "$(ssh-agent -s)" > /dev/null
+    fi
+
+    # 2. Comprueba el número de identidades cargadas
+    # ssh-add -l devuelve 0 si hay claves, 1 si no hay (o si el agente muere)
+    # Contamos el número de identidades, excluyendo la línea de "no identities"
+
+    # Obtenemos el número de identidades listadas (debería ser > 0)
+    COUNT=$(ssh-add -l 2>/dev/null | grep -c '[:]' )
+
+    if [ "$COUNT" -gt 0 ]; then
+        echo "Claves (${COUNT}) ya cargadas. No se requiere contraseña."
+        return 0
+    fi
+
+    # 3. Carga las claves si no hay ninguna
+    echo "Cargando claves SSH..."
+    ssh-add
+}
 alias ssh='ssh -A'
 
 # Grin patterns
